@@ -81,6 +81,8 @@ for (root, dirs, files) in os.walk(root_dir):
                 thumnailConverter(img_path, thum_dir + '/' + file_name)
                 previewConverter(img_path, prev_dir + '/' + file_name)
 
+print("모든 작업이 끝났습니다.")
+
 # Crop image
 def cropImg(file_path, save_path):
     with Img(fp=file_path) as im:
