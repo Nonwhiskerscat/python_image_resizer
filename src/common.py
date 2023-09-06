@@ -34,6 +34,7 @@ class CommonDef:
             os.mkdir(path)
 
     def errorDateDir():
+        CommonDef.createDir(FileRoot.resize_dir)
         CommonDef.createDir(FileRoot.error_dir)
         CommonDef.createDir(FileRoot.errorY_dir)
         CommonDef.createDir(FileRoot.errorM_dir)

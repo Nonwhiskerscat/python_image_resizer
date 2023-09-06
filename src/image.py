@@ -14,9 +14,7 @@ config = configparser.ConfigParser()
 # 자동화
 possible_img_extension = []
 
-config.read(
-    "C:/Users/김서용/Desktop/KIDCAT/파이썬_작업중/configure/image_custom.ini", encoding="UTF-8"
-)
+config.read("image_custom.ini", encoding="UTF-8")
 for key in config["Resize_Type"].keys():
     possible_img_extension.append(key)
 

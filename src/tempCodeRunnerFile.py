@@ -1,0 +1,17 @@
+w_mark1.resize(wWidth(img1.size[0]), wHeight(wWidth(img1.size[0]), 1))
+# x1 = img1.size[0] - math.ceil(1.1 * w_mark1.size[0])
+# y1 = img1.size[1] - w_mark1.size[1] - math.ceil(0.1 * w_mark1.size[0])
+# img1.watermark(image=w_mark1, transparency=0.3, left=x1, top=y1)
+# img1.save(filename="nwater1.jpg")
+
+# w_mark2.resize(wWidth(img2.size[0]), wHeight(wWidth(img2.size[0]), 2))
+# x2 = img2.size[0] - math.ceil(1.1 * w_mark2.size[0])
+# y2 = img2.size[1] - w_mark2.size[1] - math.ceil(0.1 * w_mark2.size[0])
+# img2.watermark(image=w_mark2, transparency=0.3, left=x2, top=y2)
+# img2.save(filename="nwater2.jpg")
+
+# w_mark3.resize(wWidth(img3.size[0]), wHeight(wWidth(img3.size[0]), 3))
+# x3 = img3.size[0] - math.ceil(1.1 * w_mark3.size[0])
+# y3 = img3.size[1] - w_mark3.size[1] - math.ceil(0.1 * w_mark3.size[0])
+# img3.watermark(image=w_mark3, transparency=0.3, left=x3, top=y3)
+# img3.save(filename="nwater3.jpg")
