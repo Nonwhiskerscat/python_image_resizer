@@ -27,8 +27,8 @@ for ftype in pos_img_arr:
 
 config["Size_List"] = {"thumbnail": 200, "preview": 500}
 
-config["Wamark_List"] = {}
-Wamark_List = config["Wamark_List"]
+config["Water_Type"] = {}
+Water_Type = config["Water_Type"]
 wat_img_arr = [
     ".jpg",
     ".jpeg",
@@ -39,7 +39,7 @@ wat_img_arr = [
 ]
 
 for w in wat_img_arr:
-    Wamark_List[w] = w
+    Water_Type[w] = w
 
 # config.ini 파일 생성
 with open("image_custom.ini", "wt", encoding="UTF-8") as conf_file:

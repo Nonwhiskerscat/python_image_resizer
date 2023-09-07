@@ -8,15 +8,12 @@ from common import *
 # ConfigParser 객체 생성
 config = configparser.ConfigParser()
 
-# 수동입력
-# root = input("폴더 경로를 입력하세요: ")
-
 # 자동화
-possible_img_extension = []
+possible_img_resize = []
 
 config.read("image_custom.ini", encoding="UTF-8")
 for key in config["Resize_Type"].keys():
-    possible_img_extension.append(key)
+    possible_img_resize.append(key)
 
 
 class imageCustom:
@@ -116,7 +113,7 @@ else:
         if len(files) > 0:
             for file_name in files:
                 if (
-                    os.path.splitext(file_name)[-1].lower() in possible_img_extension
+                    os.path.splitext(file_name)[-1].lower() in possible_img_resize
                     and root == FileRoot.root_dir
                 ):
                     CommonDef.createDir(FileRoot.resize_dir)
