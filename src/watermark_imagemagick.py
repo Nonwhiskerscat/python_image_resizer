@@ -7,17 +7,8 @@ import math
 import configparser
 from common import *
 
-
-global img_cnt
-img_cnt = False
-
-root = os.getcwd()
-root_dir = root.replace("\\", "/").strip('"')
-watermark_dir = root_dir + "/watermark"
-daily_dir = watermark_dir + "/daily"
-sports_dir = watermark_dir + "/sports"
-dotcom_dir = watermark_dir + "/dotcom"
-error_dir = watermark_dir + "/error"
+# import sys
+# from os.path import dirname
 
 # 자동화
 possible_img_watermark = []
@@ -44,7 +35,6 @@ def wHeight(wmark, wwidth):
 
 def wMake(file_path, save_path):
     with Image(filename=file_path) as im:
-        print(im)
         w_mark = Image(filename=w_mark_route)
         w_mark.resize(wWidth(im.size[0]), wHeight(w_mark, wWidth(im.size[0])))
         x_axis = im.size[0] - math.ceil(1.1 * w_mark.size[0])
@@ -54,7 +44,7 @@ def wMake(file_path, save_path):
 
 
 if os.path.isdir(FileRoot.root_dir) == False:
-    CommonDef.errorLogMaker(FileRoot.root_dir, "폴더가 존재하지 않습니다.")
+    CommonDef.errorLogMaker(FileRoot.root_dir, "폴더가 존재하지 않습니다.", FileRoot.watermark_dir)
 else:
     for root, dirs, files in os.walk(FileRoot.root_dir + "/연습용 사진"):
         if len(files) > 0:
@@ -68,6 +58,9 @@ else:
                     wMake(img_path, FileRoot.watermark_dir + "/" + file_name)
 
                 elif root == FileRoot.root_dir + "/연습용 사진":
-                    CommonDef.errorLogMaker(file_name, "지원하지 않는 파일 확장자입니다.")
+                    CommonDef.createDir(FileRoot.watermark_dir)
+                    CommonDef.errorLogMaker(
+                        file_name, "지원하지 않는 파일 확장자입니다.", FileRoot.watermark_dir
+                    )
 
 print("모든 작업이 끝났습니다.")

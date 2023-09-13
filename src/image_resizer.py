@@ -51,7 +51,7 @@ def originConverter(file_path, save_path):
             im.save(fp=save_path)
             print(save_path + " 원본 다운 완료")
         except Exception as error:
-            CommonDef.errorLogMaker(file_path, error)
+            CommonDef.errorLogMaker(file_path, error, FileRoot.resize_dir)
 
 
 def thumbnailConverter(file_path, save_path):
@@ -74,7 +74,7 @@ def thumbnailConverter(file_path, save_path):
             print(save_path + " 썸네일 변환 완료")
 
         except Exception as error:
-            CommonDef.errorLogMaker(file_path, error)
+            CommonDef.errorLogMaker(file_path, error, FileRoot.resize_dir)
 
 
 def previewConverter(file_path, save_path):
@@ -96,7 +96,7 @@ def previewConverter(file_path, save_path):
             im.save(fp=save_path)
             print(save_path + " 프리뷰 변환 완료")
         except Exception as error:
-            CommonDef.errorLogMaker(file_path, error)
+            CommonDef.errorLogMaker(file_path, error, FileRoot.resize_dir)
 
 
 def cropImg(file_path, save_path):
@@ -106,7 +106,7 @@ def cropImg(file_path, save_path):
 
 
 if os.path.isdir(FileRoot.root_dir) == False:
-    CommonDef.errorLogMaker(FileRoot.root_dir, "폴더가 존재하지 않습니다.")
+    CommonDef.errorLogMaker(FileRoot.root_dir, "폴더가 존재하지 않습니다.", FileRoot.resize_dir)
 
 else:
     for root, dirs, files in os.walk(FileRoot.root_dir):
@@ -125,10 +125,12 @@ else:
                     thumbnailConverter(img_path, FileRoot.thum_dir + "/" + file_name)
                     previewConverter(img_path, FileRoot.prev_dir + "/" + file_name)
                 elif root == FileRoot.root_dir:
-                    CommonDef.errorLogMaker(file_name, "지원하지 않는 파일 확장자입니다.")
+                    CommonDef.errorLogMaker(
+                        file_name, "지원하지 않는 파일 확장자입니다.", FileRoot.resize_dir
+                    )
 
 
 print("모든 작업이 끝났습니다.")
 
 # 수동 입력 시 사용
-# os.system("pause")
+os.system("pause")
