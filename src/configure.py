@@ -38,6 +38,13 @@ wat_img_arr = [
     ".bmp",
 ]
 
+config["Water_Route"] = {
+    "donga_daily": os.getcwd() + "/watermark_logo/daily.png",
+    "donga_sports": os.getcwd() + "/watermark_logo/sports.png",
+    "donga_dotcom": os.getcwd() + "/watermark_logo/dotcom.png",
+}
+
+
 for w in wat_img_arr:
     Water_Type[w] = w
 
