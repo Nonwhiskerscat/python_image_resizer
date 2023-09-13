@@ -36,6 +36,7 @@ wat_img_arr = [
     ".png",
     ".webp",
     ".bmp",
+    ".gif",
 ]
 
 config["Water_Route"] = {

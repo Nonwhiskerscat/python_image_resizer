@@ -28,18 +28,27 @@ class FileRoot:
         elif idx == 6:
             return errorA_dir
 
-    root = os.getcwd()
-    root_dir = root.replace("\\", "/").strip('"')
-    watermark_dir = root_dir + "/watermark"
-    daily_dir = watermark_dir + "/daily"
-    sports_dir = watermark_dir + "/sports"
-    dotcom_dir = watermark_dir + "/dotcom"
-    error_dir_w = watermark_dir + "/error"
+    def RootDir(cwd):
+        return cwd.replace("\\", "/").strip('"')
 
-    resize_dir = root_dir + "/resize"
-    origin_dir = resize_dir + "/original"
-    thum_dir = resize_dir + "/thumbnail"
-    prev_dir = resize_dir + "/preview"
+    def SubDir(cwd, type):
+        watermark_dir = FileRoot.RootDir(cwd) + "/watermark"
+
+        resize_dir = FileRoot.RootDir(cwd) + "/resize"
+        origin_dir = resize_dir + "/original"
+        thum_dir = resize_dir + "/thumbnail"
+        prev_dir = resize_dir + "/preview"
+
+        if type == "watermark":
+            return watermark_dir
+        elif type == "resize":
+            return resize_dir
+        elif type == "origin":
+            return origin_dir
+        elif type == "thumbnail":
+            return thum_dir
+        elif type == "preview":
+            return prev_dir
 
 
 class CommonDef:

@@ -8,6 +8,9 @@ from common import *
 # ConfigParser 객체 생성
 config = configparser.ConfigParser()
 
+f_rt, i_rt = input("파일 경로, 변경 이미지 idx(1:원본 2:썸네일 3:프리뷰 그 외: 전체): ").split()
+print(f_rt, i_rt)
+
 # 자동화
 possible_img_resize = []
 
@@ -39,7 +42,7 @@ def originConverter(file_path, save_path):
         try:
             while os.path.isfile(save_path) == True:
                 save_path = (
-                    FileRoot.origin_dir
+                    FileRoot.SubDir(f_rt, "origin")
                     + "/"
                     + os.path.splitext(file_name)[-2]
                     + " ("
@@ -51,7 +54,9 @@ def originConverter(file_path, save_path):
             im.save(fp=save_path)
             print(save_path + " 원본 다운 완료")
         except Exception as error:
-            CommonDef.errorLogMaker(file_path, error, FileRoot.resize_dir)
+            CommonDef.errorLogMaker(
+                file_path, str(error), FileRoot.SubDir(f_rt, "resize")
+            )
 
 
 def thumbnailConverter(file_path, save_path):
@@ -61,7 +66,7 @@ def thumbnailConverter(file_path, save_path):
         try:
             while os.path.isfile(save_path) == True:
                 save_path = (
-                    FileRoot.thum_dir
+                    FileRoot.SubDir(f_rt, "thumbnail")
                     + "/"
                     + os.path.splitext(file_name)[-2]
                     + " ("
@@ -72,9 +77,10 @@ def thumbnailConverter(file_path, save_path):
                 file_idx += 1
             im.save(fp=save_path)
             print(save_path + " 썸네일 변환 완료")
-
         except Exception as error:
-            CommonDef.errorLogMaker(file_path, error, FileRoot.resize_dir)
+            CommonDef.errorLogMaker(
+                file_path, str(error), FileRoot.SubDir(f_rt, "resize")
+            )
 
 
 def previewConverter(file_path, save_path):
@@ -84,7 +90,7 @@ def previewConverter(file_path, save_path):
         try:
             while os.path.isfile(save_path) == True:
                 save_path = (
-                    FileRoot.prev_dir
+                    FileRoot.SubDir(f_rt, "preview")
                     + "/"
                     + os.path.splitext(file_name)[-2]
                     + " ("
@@ -96,7 +102,9 @@ def previewConverter(file_path, save_path):
             im.save(fp=save_path)
             print(save_path + " 프리뷰 변환 완료")
         except Exception as error:
-            CommonDef.errorLogMaker(file_path, error, FileRoot.resize_dir)
+            CommonDef.errorLogMaker(
+                file_path, str(error), FileRoot.SubDir(f_rt, "resize")
+            )
 
 
 def cropImg(file_path, save_path):
@@ -105,28 +113,43 @@ def cropImg(file_path, save_path):
         im.save(fp=save_path)
 
 
-if os.path.isdir(FileRoot.root_dir) == False:
-    CommonDef.errorLogMaker(FileRoot.root_dir, "폴더가 존재하지 않습니다.", FileRoot.resize_dir)
+if os.path.isdir(str(FileRoot.RootDir(f_rt))) == False:
+    CommonDef.errorLogMaker(
+        FileRoot.RootDir(f_rt), "폴더가 존재하지 않습니다.", FileRoot.SubDir(f_rt, "resize")
+    )
 
 else:
-    for root, dirs, files in os.walk(FileRoot.root_dir):
+    for root, dirs, files in os.walk(FileRoot.RootDir(f_rt)):
         if len(files) > 0:
             for file_name in files:
-                if (
-                    os.path.splitext(file_name)[-1].lower() in possible_img_resize
-                    and root == FileRoot.root_dir
-                ):
-                    CommonDef.createDir(FileRoot.resize_dir)
-                    CommonDef.createDir(FileRoot.origin_dir)
-                    CommonDef.createDir(FileRoot.thum_dir)
-                    CommonDef.createDir(FileRoot.prev_dir)
+                if os.path.splitext(file_name)[
+                    -1
+                ].lower() in possible_img_resize and root == FileRoot.RootDir(f_rt):
+                    CommonDef.createDir(FileRoot.SubDir(f_rt, "resize"))
                     img_path = root + "/" + file_name
-                    originConverter(img_path, FileRoot.origin_dir + "/" + file_name)
-                    thumbnailConverter(img_path, FileRoot.thum_dir + "/" + file_name)
-                    previewConverter(img_path, FileRoot.prev_dir + "/" + file_name)
-                elif root == FileRoot.root_dir:
+
+                    if i_rt == "1" or (i_rt != "2" and i_rt != "3"):
+                        CommonDef.createDir(FileRoot.SubDir(f_rt, "origin"))
+                        originConverter(
+                            img_path, FileRoot.SubDir(f_rt, "origin") + "/" + file_name
+                        )
+
+                    if i_rt == "2" or (i_rt != "1" and i_rt != "3"):
+                        CommonDef.createDir(FileRoot.SubDir(f_rt, "thumbnail"))
+                        thumbnailConverter(
+                            img_path,
+                            FileRoot.SubDir(f_rt, "thumbnail") + "/" + file_name,
+                        )
+
+                    if i_rt == "3" or (i_rt != "1" and i_rt != "2"):
+                        CommonDef.createDir(FileRoot.SubDir(f_rt, "preview"))
+                        previewConverter(
+                            img_path, FileRoot.SubDir(f_rt, "preview") + "/" + file_name
+                        )
+                elif root == FileRoot.RootDir(f_rt):
+                    CommonDef.createDir(FileRoot.SubDir(f_rt, "resize"))
                     CommonDef.errorLogMaker(
-                        file_name, "지원하지 않는 파일 확장자입니다.", FileRoot.resize_dir
+                        file_name, "지원하지 않는 파일 확장자입니다.", FileRoot.SubDir(f_rt, "resize")
                     )
 
 
