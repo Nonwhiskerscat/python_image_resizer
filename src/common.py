@@ -7,6 +7,9 @@ class DateTime:
 
 
 class FileRoot:
+    # 파일 이동 시 수정 필수!!!!!!!!!!!!!!!!!!!!
+    in_root = "C:/Users/김서용/Desktop/wps_image_converter/Program/image_custom.ini"
+
     def LogDir(parent, idx):
         logY_dir = parent + "/" + str(DateTime.now.year)
         logD_dir = (
@@ -57,11 +60,14 @@ class CommonDef:
         CommonDef.createDir(FileRoot.LogDir(parent, 2))
 
     # 로그 txt 생성 메서드
-    def makeLogTxt(path, msg, parent):
+    def makeLogTxt(path, msg, parent, bool):
         CommonDef.makeLogDir(parent)
-        tpath = FileRoot.LogDir(parent, 2) + "/" + "log.txt"
+        if bool == True:
+            tpath = FileRoot.LogDir(parent, 2) + "/" + "clear.txt"
+        else:
+            tpath = FileRoot.LogDir(parent, 2) + "/" + "error.txt"
         f = open(tpath, "a")
-        f.write(str(DateTime.now) + ": " + path + " " + msg + "\n")
+        f.write(str(DateTime.now) + " > " + path + " " + msg + "\n")
         f.close()
 
     # 파일 확장자 추출

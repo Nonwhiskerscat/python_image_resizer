@@ -1,7 +1,6 @@
 import configparser
 import datetime as dt
 import os
-from common import *
 
 # ConfigParser 객체 생성
 config = configparser.ConfigParser()
@@ -64,13 +63,12 @@ config["Water_Route"] = {
 
 # 이미지 비율 워터마크 크기
 config["Water_Ratio"] = {1: 0.15, 4: 0.15, 5: 0.15}
-config["Water_Opacity"] = {1: 225, 4: 225, 5: 225}
+config["Water_Opacity"] = {1: 0.9, 4: 0.9, 5: 0.9}
 # 1: 동아일보, 4: 스포츠동아, 5: 동아닷컴
 
 # 로그 및 에러로그 파일 위치
 config["LogFile_Route"] = {
-    "errorlog": "C:/Users/김서용/Desktop/wps_image_converter/errorlog",
-    "clearlog": "C:/Users/김서용/Desktop/wps_image_converter/clearlog",
+    "root": "C:/Users/김서용/Desktop/wps_image_converter/Log",
 }
 
 # config.ini 파일 생성
