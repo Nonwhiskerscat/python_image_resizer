@@ -4,6 +4,14 @@ import os
 import math
 import configparser
 from common import *
+import sys
+
+# sys.argv[0] = file_name
+# sys.argv[1~-1] = image_files
+
+input_images = sys.argv
+del input_images[0]
+print(input_images)
 
 # ConfigParser 객체 생성
 config = configparser.ConfigParser()

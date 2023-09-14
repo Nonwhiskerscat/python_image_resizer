@@ -1,1 +1,1 @@
-                        CommonDef.createDir(FileRoot.SubDir(f_rt, "origin"))
+config["Ini_Root"] = {"path": os.path.abspath("image_custom.ini")}

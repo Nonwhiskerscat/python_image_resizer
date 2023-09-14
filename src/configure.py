@@ -1,6 +1,7 @@
 import configparser
 import datetime as dt
 import os
+from common import *
 
 # ConfigParser 객체 생성
 config = configparser.ConfigParser()
@@ -23,10 +24,19 @@ pos_img_arr = [
 for ftype in pos_img_arr:
     Resize_Type[ftype] = ftype
 
-# 세션 생성
-
+# 이미지 리사이징 사이즈
 config["Size_List"] = {"thumbnail": 200, "preview": 500}
 
+
+# 워터마크 이미지 지원 idx
+config["Water_Idx"] = {}
+Water_Idx = config["Water_Idx"]
+wat_idx_arr = ["1", "4", "5"]
+
+for w in wat_idx_arr:
+    Water_Idx[w] = w
+
+# 워터마크 이미지 지원 확장자
 config["Water_Type"] = {}
 Water_Type = config["Water_Type"]
 wat_img_arr = [
@@ -39,15 +49,29 @@ wat_img_arr = [
     ".gif",
 ]
 
-config["Water_Route"] = {
-    "donga_daily": os.getcwd() + "/watermark_logo/daily.png",
-    "donga_sports": os.getcwd() + "/watermark_logo/sports.png",
-    "donga_dotcom": os.getcwd() + "/watermark_logo/dotcom.png",
-}
-
-
 for w in wat_img_arr:
     Water_Type[w] = w
+
+# 워터마크 이미지 위치
+config["Water_Route"] = {
+    1: os.getcwd().replace("\\", "/").strip('"')
+    + "/watermark_logo/daily.png",  # 동아일보ss
+    4: os.getcwd().replace("\\", "/").strip('"')
+    + "/watermark_logo/sports.png",  # 스포츠동아
+    5: os.getcwd().replace("\\", "/").strip('"')
+    + "/watermark_logo/dotcom.png",  # 동아닷컴ss
+}
+
+# 이미지 비율 워터마크 크기
+config["Water_Ratio"] = {1: 0.15, 4: 0.15, 5: 0.15}
+config["Water_Opacity"] = {1: 225, 4: 225, 5: 225}
+# 1: 동아일보, 4: 스포츠동아, 5: 동아닷컴
+
+# 로그 및 에러로그 파일 위치
+config["LogFile_Route"] = {
+    "errorlog": "C:/Users/김서용/Desktop/wps_image_converter/errorlog",
+    "clearlog": "C:/Users/김서용/Desktop/wps_image_converter/clearlog",
+}
 
 # config.ini 파일 생성
 with open("image_custom.ini", "wt", encoding="UTF-8") as conf_file:
