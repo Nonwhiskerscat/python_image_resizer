@@ -1,14 +1,16 @@
 import os
 import datetime as dt
 
+# 파일 이동 시 수정 필수!!!!!!!!!!!!!!!!!!!!
+
 
 class DateTime:
     now = dt.datetime.now()
 
 
 class FileRoot:
-    # 파일 이동 시 수정 필수!!!!!!!!!!!!!!!!!!!!
-    in_root = "C:/Users/김서용/Desktop/wps_image_converter/Program/image_custom.ini"
+    program_dirname = "C:/Users/김서용/Desktop/wps_image_converter"
+    in_root = program_dirname + "/Program/image_custom.ini"
 
     def LogDir(parent, idx):
         logY_dir = parent + "/" + str(DateTime.now.year)
@@ -30,21 +32,8 @@ class FileRoot:
     def SubDir(cwd, type):
         watermark_dir = FileRoot.RootDir(cwd) + "/watermark"
 
-        resize_dir = FileRoot.RootDir(cwd) + "/resize"
-        origin_dir = resize_dir + "/original"
-        thum_dir = resize_dir + "/thumbnail"
-        prev_dir = resize_dir + "/preview"
-
         if type == "watermark":
             return watermark_dir
-        elif type == "resize":
-            return resize_dir
-        elif type == "origin":
-            return origin_dir
-        elif type == "thumbnail":
-            return thum_dir
-        elif type == "preview":
-            return prev_dir
 
 
 class CommonDef:
@@ -70,7 +59,17 @@ class CommonDef:
         f.write(str(DateTime.now) + " > " + path + " " + msg + "\n")
         f.close()
 
+    # 파일 주소 추출
+    def getFileRoot(i_path):
+        return os.path.dirname(i_path)
+
     # 파일 확장자 추출
-    def getFileExt(cat):
-        _, extension = os.path.splitext(cat)
+    def getFileExt(i_path):
+        _, extension = os.path.splitext(i_path)
         return extension
+
+    # 파일 이름 추출
+    def getFileName(i_path):
+        base_name = os.path.basename(i_path)
+        file_name, _ = os.path.splitext(base_name)
+        return file_name

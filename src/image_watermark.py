@@ -54,12 +54,12 @@ def watermarkForImg(i_input, w_image, w_opacity):
 
     i_output = i_root + "/watermark/" + os.path.basename(i_input)
 
-    if not os.path.isdir(i_input):
+    if not os.path.isfile(i_input):
         log_msg = "이미지 파일 누락"
         return False
 
-    if CommonDef.getFileExt(i_path).lower() not in possible_img_watermark:
-        log_msg = "지원하지 않는 파일 확장자(" + CommonDef.getFileExt(i_path) + ")"
+    if CommonDef.getFileExt(i_input).lower() not in possible_img_watermark:
+        log_msg = "지원하지 않는 파일 확장자(" + CommonDef.getFileExt(i_input) + ")"
         return False
 
     CommonDef.createDir(FileRoot.SubDir(i_root, "watermark"))

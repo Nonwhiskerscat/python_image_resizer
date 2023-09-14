@@ -1,6 +1,7 @@
 import configparser
 import datetime as dt
 import os
+from common import *
 
 # ConfigParser 객체 생성
 config = configparser.ConfigParser()
@@ -53,12 +54,9 @@ for w in wat_img_arr:
 
 # 워터마크 이미지 위치
 config["Water_Route"] = {
-    1: os.getcwd().replace("\\", "/").strip('"')
-    + "/watermark_logo/daily.png",  # 동아일보ss
-    4: os.getcwd().replace("\\", "/").strip('"')
-    + "/watermark_logo/sports.png",  # 스포츠동아
-    5: os.getcwd().replace("\\", "/").strip('"')
-    + "/watermark_logo/dotcom.png",  # 동아닷컴ss
+    1: FileRoot.program_dirname + "/Watermark/daily.png",  # 동아일보ss
+    4: FileRoot.program_dirname + "/Watermark/sports.png",  # 스포츠동아
+    5: FileRoot.program_dirname + "/Watermark/dotcom.png",  # 동아닷컴ss
 }
 
 # 이미지 비율 워터마크 크기
@@ -67,9 +65,7 @@ config["Water_Opacity"] = {1: 0.9, 4: 0.9, 5: 0.9}
 # 1: 동아일보, 4: 스포츠동아, 5: 동아닷컴
 
 # 로그 및 에러로그 파일 위치
-config["LogFile_Route"] = {
-    "root": "C:/Users/김서용/Desktop/wps_image_converter/Log",
-}
+config["LogFile_Route"] = {"root": FileRoot.program_dirname + "/Log"}
 
 # config.ini 파일 생성
 with open("image_custom.ini", "wt", encoding="UTF-8") as conf_file:
