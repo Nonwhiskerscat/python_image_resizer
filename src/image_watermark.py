@@ -54,6 +54,10 @@ def watermarkForImg(i_input, w_image, w_opacity):
 
     i_output = i_root + "/watermark/" + os.path.basename(i_input)
 
+    if not os.path.isdir(i_input):
+        log_msg = "이미지 파일 누락"
+        return False
+
     if CommonDef.getFileExt(i_path).lower() not in possible_img_watermark:
         log_msg = "지원하지 않는 파일 확장자(" + CommonDef.getFileExt(i_path) + ")"
         return False
@@ -90,10 +94,10 @@ def watermarkForImg(i_input, w_image, w_opacity):
     # 가상 이미지 저장
     try:
         transparent.save(i_output, "PNG")
-        log_msg = " 워터마크 이미지 제작 완료"
+        log_msg = "워터마크 이미지 제작 완료"
         return True
     except Exception as error_msg:
-        log_msg = str(error_msg)
+        log_msg = "에러 발생" + str(error_msg)
         return False
 
 
