@@ -54,9 +54,9 @@ for w in wat_img_arr:
 
 # 워터마크 이미지 위치
 config["Water_Route"] = {
-    1: FileRoot.program_dirname + "/Watermark/daily.png",  # 동아일보ss
-    4: FileRoot.program_dirname + "/Watermark/sports.png",  # 스포츠동아
-    5: FileRoot.program_dirname + "/Watermark/dotcom.png",  # 동아닷컴ss
+    1: FileRoot.program_dirname + "/Program/Watermark/daily.png",  # 동아일보ss
+    4: FileRoot.program_dirname + "/Program/Watermark/sports.png",  # 스포츠동아
+    5: FileRoot.program_dirname + "/Program/Watermark/dotcom.png",  # 동아닷컴ss
 }
 
 # 이미지 비율 워터마크 크기

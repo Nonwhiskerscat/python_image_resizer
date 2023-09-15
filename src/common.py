@@ -9,13 +9,17 @@ class DateTime:
 
 
 class FileRoot:
-    program_dirname = "C:/Users/김서용/Desktop/wps_image_converter"
+    program_dirname = (
+        os.path.abspath("./Desktop/wps_image_converter").replace("\\", "/").strip('"')
+    )
     in_root = program_dirname + "/Program/image_custom.ini"
+    in_root = os.path.abspath(in_root)
 
     def LogDir(parent, idx):
         logY_dir = parent + "/" + str(DateTime.now.year)
+        logM_dir = logY_dir + "/" + str(DateTime.now.month).zfill(2)
         logD_dir = (
-            logY_dir
+            logM_dir
             + "/"
             + str(DateTime.now.month).zfill(2)
             + str(DateTime.now.day).zfill(2)
@@ -24,6 +28,8 @@ class FileRoot:
         if idx == 1:
             return logY_dir
         elif idx == 2:
+            return logM_dir
+        elif idx == 3:
             return logD_dir
 
     def RootDir(cwd):
@@ -47,14 +53,15 @@ class CommonDef:
     def makeLogDir(parent):
         CommonDef.createDir(FileRoot.LogDir(parent, 1))
         CommonDef.createDir(FileRoot.LogDir(parent, 2))
+        CommonDef.createDir(FileRoot.LogDir(parent, 3))
 
     # 로그 txt 생성 메서드
     def makeLogTxt(path, msg, parent, bool):
         CommonDef.makeLogDir(parent)
         if bool == True:
-            tpath = FileRoot.LogDir(parent, 2) + "/" + "clear.txt"
+            tpath = FileRoot.LogDir(parent, 3) + "/" + "clear.txt"
         else:
-            tpath = FileRoot.LogDir(parent, 2) + "/" + "error.txt"
+            tpath = FileRoot.LogDir(parent, 3) + "/" + "error.txt"
         f = open(tpath, "a")
         f.write(str(DateTime.now) + " > " + path + " " + msg + "\n")
         f.close()

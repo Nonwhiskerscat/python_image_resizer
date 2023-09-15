@@ -8,7 +8,6 @@ import sys
 possible_img_idx = []
 possible_img_watermark = []
 
-
 # ConfigParser 객체C:\Users\김서용\Desktop\gif_water 4 생성
 config = configparser.ConfigParser()
 i_path = FileRoot.RootDir(sys.argv[1])
