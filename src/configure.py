@@ -5,11 +5,11 @@ from common import *
 
 # ConfigParser 객체 생성
 config = configparser.ConfigParser()
-config["Resize_Type"] = {}
-Resize_Type = config["Resize_Type"]
+config["Image_TypeI"] = {}
+Image_TypeI = config["Image_TypeI"]
 
-if not "Resize_Type" in config:
-    print("config['Resize_Type'] not exist")
+if not "Image_TypeI" in config:
+    print("config['Image_TypeI'] not exist")
 
 pos_img_arr = [
     ".jpg",
@@ -18,11 +18,10 @@ pos_img_arr = [
     ".png",
     ".webp",
     ".gif",
-    ".bmp",
 ]
 
 for ftype in pos_img_arr:
-    Resize_Type[ftype] = ftype
+    Image_TypeI[ftype] = ftype
 
 # 이미지 리사이징 사이즈
 config["Size_List"] = {"thumbnail": 200, "preview": 500}
@@ -35,22 +34,6 @@ wat_idx_arr = ["1", "4", "5"]
 
 for w in wat_idx_arr:
     Water_Idx[w] = w
-
-# 워터마크 이미지 지원 확장자
-config["Water_Type"] = {}
-Water_Type = config["Water_Type"]
-wat_img_arr = [
-    ".jpg",
-    ".jpeg",
-    ".bmp",
-    ".png",
-    ".webp",
-    ".bmp",
-    ".gif",
-]
-
-for w in wat_img_arr:
-    Water_Type[w] = w
 
 # 워터마크 이미지 위치
 config["Water_Route"] = {

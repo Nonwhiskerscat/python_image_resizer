@@ -17,7 +17,7 @@ w_idx = str(sys.argv[-1])
 # image 워터마크 파일 생성
 
 config.read(FileRoot.in_root, encoding="UTF-8")
-for key in config["Water_Type"].keys():
+for key in config["Image_TypeI"].keys():
     possible_img_watermark.append(key)
 for key in config["Water_Idx"].keys():
     possible_img_idx.append(key)
@@ -54,7 +54,7 @@ def watermarkForImg(i_input, w_image, w_opacity):
     i_output = i_root + "/watermark/" + os.path.basename(i_input)
 
     if not os.path.isfile(i_input):
-        log_msg = "이미지 파일 누락"
+        log_msg = "유효하지 않은 패스"
         return False
 
     if CommonDef.getFileExt(i_input).lower() not in possible_img_watermark:
