@@ -11,10 +11,6 @@ i_input = sys.argv[1].replace("\\", "/").strip('"')
 # 이미지 플립 idx
 flip_idx = sys.argv[-1]  # 이미지 플립 idx
 
-# FileRoot.in_root = "E:\workspace\python_image_resizer\\image_custom.ini"
-
-# i_input = "C:\\Users\\김서용\\Desktop\\더미자료\\new_wps\\ttphoto\\animal-1844835.jpg"
-# flip_idx = 1
 
 # ini 파일 읽어오기
 config = configparser.ConfigParser()
@@ -65,7 +61,7 @@ def flipGif(input, output, f_idx):
             flipped_frame = flipImg(im.copy(), f_idx)
             frames.append(flipped_frame)
 
-        # 회전된 프레임을 새로운 GIF 파일로 저장
+        # 플립된 프레임을 새로운 GIF 파일로 저장
         frames[0].save(output, save_all=True, append_images=frames[1:], loop=0)
 
 

@@ -1,5 +1,6 @@
 import os
 import datetime as dt
+from PIL import Image
 
 # 파일 이동 시 수정 필수!!!!!!!!!!!!!!!!!!!!
 
@@ -36,10 +37,8 @@ class FileRoot:
         return cwd.replace("\\", "/").strip('"')
 
     def SubDir(cwd, type):
-        watermark_dir = FileRoot.RootDir(cwd) + "/watermark"
-
-        if type == "watermark":
-            return watermark_dir
+        sub_dir = f"{FileRoot.RootDir(cwd)}/{type}"
+        return sub_dir
 
 
 class CommonDef:
@@ -82,10 +81,68 @@ class CommonDef:
         return file_name
 
     # isdit 커스텀 함수
-    ## 기존의 isdigit()가 음수 혹은 float를 False 처리...
+    ## 기존의 isdigit()가 음수 혹은 float를 False 처리해버리기 때문에 어쩔 수 없이 만든 함수...
     def isDigit(str):
         try:
             cat = float(str)
             return True
         except ValueError:
             return False
+
+    # Gif 이미지의 프레임 개수를 리턴하는 함수
+    def aniFrames(img):
+        with Image.open(img) as im:
+            return im.n_frames
+
+
+class DeleteFile:
+    # 특정 파일 삭제(단일)
+    def DeleteFileAn(f_path):
+        try:
+            os.unlink(f_path)
+        except Exception as e:
+            print(f"파일 삭제 오류: {e}")
+
+    # 특정 파일 삭제(배열 혹은 sys.argv)
+    def DeleteFileStr(f_paths):
+        for files in f_paths:
+            try:
+                os.unlink(files)
+            except Exception as e:
+                print(f"파일 삭제 오류: {e}")
+
+    # 폴더 내 모든 파일 삭제
+    def DeleteAll(fo_path):
+        for files in os.listdir(fo_path):
+            file_path = os.path.join(fo_path, files)
+            try:
+                if os.path.isfile(file_path):
+                    os.unlink(file_path)
+            except Exception as e:
+                print(f"파일 삭제 오류: {e}")
+
+    # 폴더 내 특정 파일 삭제(확장자 기준)
+    def DeleteFileExt(fo_path, ext):
+        # 폴더 내의 파일 목록 가져오기
+        for files in os.listdir(fo_path):
+            # 특정 확장자를 가진 파일인지 확인
+            try:
+                if files.endswith(ext):
+                    file_path = os.path.join(fo_path, files)
+                    # 파일 삭제
+                    os.unlink(file_path)
+            except Exception as e:
+                print(f"파일 삭제 오류: {e}")
+
+    # 폴더 내 특정 파일 삭제(파일명 기준)
+    def DeleteFileKey(fo_path, keyword):
+        # 폴더 내의 파일 목록 가져오기
+        for files in os.listdir(fo_path):
+            # 특정 문자열을 포함하는 파일인지 확인
+            try:
+                if keyword in files:
+                    file_path = os.path.join(fo_path, files)
+                    # 파일 삭제
+                    os.unlink(file_path)
+            except Exception as e:
+                print(f"파일 삭제 오류: {e}")

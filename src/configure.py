@@ -5,13 +5,15 @@ from common import *
 
 # ConfigParser 객체 생성
 config = configparser.ConfigParser()
+
+# 프로그램 지원 가능 확장자
 config["Image_TypeI"] = {}
 Image_TypeI = config["Image_TypeI"]
 
 if not "Image_TypeI" in config:
     print("config['Image_TypeI'] not exist")
 
-pos_img_arr = [
+pos_img_arr_1 = [
     ".jpg",
     ".jpeg",
     ".bmp",
@@ -20,8 +22,21 @@ pos_img_arr = [
     ".gif",
 ]
 
-for ftype in pos_img_arr:
+for ftype in pos_img_arr_1:
     Image_TypeI[ftype] = ftype
+
+
+# 움짤 전용 확장자
+config["Ani_Image"] = {}
+Ani_Image = config["Ani_Image"]
+
+if not "Ani_Image" in config:
+    print("config['Ani_Image'] not exist")
+
+pos_img_arr_2 = [".gif", ".webp"]
+
+for ftype in pos_img_arr_2:
+    Ani_Image[ftype] = ftype
 
 # 이미지 리사이징 사이즈
 config["Size_List"] = {"thumbnail": 200, "preview": 500}
