@@ -1,7 +1,6 @@
 import os
 import configparser
 import sys
-from imgpy import Img
 from PIL import Image, ImageSequence
 from common import *
 
@@ -26,20 +25,20 @@ CommonDef.createDir(log_dir)
 
 
 # 정적 이미지 로테이트 메서드
-def rotate_image(img, angle):
+def rotateImg(img, angle):
     img_rotated = img.rotate(float(angle), expand=True)
     return img_rotated
 
 
 # 동적 이미지 로테이트 메서드
-def rotate_gif(input, output, angle):
+def rotateGif(input, output, angle):
     with Image.open(input) as im:
         frames = []
 
         # 프레임 추출 및 각 프레임 회전
         for frame in range(im.n_frames):
             im.seek(frame)
-            rotated_frame = rotate_image(im.copy(), angle)
+            rotated_frame = rotateImg(im.copy(), angle)
             frames.append(rotated_frame)
 
         # 회전된 프레임을 새로운 GIF 파일로 저장
@@ -51,7 +50,7 @@ def rotateCommon(img, rot):
     global log_msg, i_output
 
     # 결과 이미지 패스 > 원본과 같은 폴더에서 파일 이름_rot로테이트 앵글
-    new_path = f"{CommonDef.getFileName(img)}_rot{rot}" + CommonDef.getFileExt(img)
+    new_path = f"{CommonDef.getFileName(img)}_rot{rot}{CommonDef.getFileExt(img)}"
     i_output = os.path.join(CommonDef.getFileRoot(img), new_path)
 
     # 입력된 패스가 유효하지 않을 때
@@ -65,7 +64,7 @@ def rotateCommon(img, rot):
         return False
 
     # 회전 값이 int형 혹은 float형이 아닐 때
-    if not rot.isdigit():
+    if not CommonDef.isDigit(rot):
         log_msg = f"회전값 수치 오류({rot})"
         return False
 
@@ -73,12 +72,12 @@ def rotateCommon(img, rot):
         # 이미지 형식이 Gif가 아닐 때
         if CommonDef.getFileExt(img).lower() != ".gif":
             with Image.open(img) as im:
-                rotated_image = rotate_image(img, rot)
+                rotated_image = rotateImg(im, rot)
                 rotated_image.save(fp=i_output)
 
         # 이미지 형식이 Gif일 때
         else:
-            rotate_gif(img, i_output, rot)
+            rotateGif(img, i_output, rot)
 
         log_msg = "이미지 로테이트 완료"
 

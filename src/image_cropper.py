@@ -42,7 +42,7 @@ def cropImg(i_input, x1, y1, x2, y2):
         return False
 
     # 이미지 좌표의 값이 숫자 형식이 아닐 때
-    if not all(val.isdigit() for val in (x1, y1, x2, y2)):
+    if not all(CommonDef.isDigit(val) for val in (x1, y1, x2, y2)):
         log_msg = f"Crop 파라미터 형식 오류({x1},{y1}_{x2},{y2})"
         return False
 

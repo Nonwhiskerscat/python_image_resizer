@@ -80,3 +80,12 @@ class CommonDef:
         base_name = os.path.basename(i_path)
         file_name, _ = os.path.splitext(base_name)
         return file_name
+
+    # isdit 커스텀 함수
+    ## 기존의 isdigit()가 음수 혹은 float를 False 처리...
+    def isDigit(str):
+        try:
+            cat = float(str)
+            return True
+        except ValueError:
+            return False

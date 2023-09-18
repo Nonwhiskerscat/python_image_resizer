@@ -25,7 +25,7 @@ CommonDef.createDir(log_dir)
 img_dura = sys.argv[-1]
 
 # 이미지 Duration Default 값
-if not img_dura.isdigit():
+if not CommonDef.isDigit(img_dura):
     img_dura = 500
 else:
     img_dura = int(img_dura)
