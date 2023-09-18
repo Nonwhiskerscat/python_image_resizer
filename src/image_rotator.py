@@ -25,13 +25,13 @@ log_dir = config["LogFile_Route"]["root"]
 CommonDef.createDir(log_dir)
 
 
-# 이미지 로테이트 메서드
+# 정적 이미지 로테이트 메서드
 def rotate_image(img, angle):
     img_rotated = img.rotate(float(angle), expand=True)
     return img_rotated
 
 
-# Gif 이미지 로테이트 메서드
+# 동적 이미지 로테이트 메서드
 def rotate_gif(input, output, angle):
     with Image.open(input) as im:
         frames = []
@@ -54,29 +54,35 @@ def rotateCommon(img, rot):
     new_path = f"{CommonDef.getFileName(img)}_rot{rot}" + CommonDef.getFileExt(img)
     i_output = os.path.join(CommonDef.getFileRoot(img), new_path)
 
+    # 입력된 패스가 유효하지 않을 때
     if not os.path.isfile(img):
         log_msg = "유효하지 않은 패스"
         return False
 
+    # 해당 기능을 지원할 수 있는 확장자가 아닐 때
     if CommonDef.getFileExt(img).lower() not in possible_img_rotate:
         log_msg = "지원하지 않는 파일 확장자(" + CommonDef.getFileExt(img) + ")"
         return False
 
+    # 회전 값이 int형 혹은 float형이 아닐 때
     if not rot.isdigit():
         log_msg = f"회전값 수치 오류({rot})"
         return False
 
     try:
+        # 이미지 형식이 Gif가 아닐 때
         if CommonDef.getFileExt(img).lower() != ".gif":
             with Image.open(img) as im:
                 rotated_image = rotate_image(img, rot)
                 rotated_image.save(fp=i_output)
 
+        # 이미지 형식이 Gif일 때
         else:
             rotate_gif(img, i_output, rot)
 
         log_msg = "이미지 로테이트 완료"
 
+    # 이미지 로테이트 실패 시, 에러 메시지 발생
     except Exception as error_msg:
         log_msg = f"이미지 로테이트 실패 {str(error_msg)}"
         return False
@@ -84,6 +90,7 @@ def rotateCommon(img, rot):
     return True
 
 
+# 로그 파일 업데이트
 if rotateCommon(i_input, i_rotate) == True:
     CommonDef.makeLogTxt(i_output.replace("\\", "/").strip('"'), log_msg, log_dir, True)
 else:
