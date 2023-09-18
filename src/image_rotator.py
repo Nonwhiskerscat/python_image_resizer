@@ -1,0 +1,92 @@
+import os
+import configparser
+import sys
+from imgpy import Img
+from PIL import Image, ImageSequence
+from common import *
+
+# 이미지 파일
+i_input = sys.argv[1].replace("\\", "/").strip('"')
+
+# 이미지 회전 각도
+i_rotate = sys.argv[-1]  # 이미지 회전 각도
+
+# ini 파일 읽어오기
+config = configparser.ConfigParser()
+
+possible_img_rotate = []
+
+config.read(FileRoot.in_root, encoding="UTF-8")
+for key in config["Image_TypeI"].keys():
+    possible_img_rotate.append(key)
+
+# 로그 파일 생성 및 여부
+log_dir = config["LogFile_Route"]["root"]
+CommonDef.createDir(log_dir)
+
+
+# 이미지 로테이트 메서드
+def rotate_image(img, angle):
+    img_rotated = img.rotate(float(angle), expand=True)
+    return img_rotated
+
+
+# Gif 이미지 로테이트 메서드
+def rotate_gif(input, output, angle):
+    with Image.open(input) as im:
+        frames = []
+
+        # 프레임 추출 및 각 프레임 회전
+        for frame in range(im.n_frames):
+            im.seek(frame)
+            rotated_frame = rotate_image(im.copy(), angle)
+            frames.append(rotated_frame)
+
+        # 회전된 프레임을 새로운 GIF 파일로 저장
+        frames[0].save(output, save_all=True, append_images=frames[1:], loop=0)
+
+
+# 이미지 로테이트 종합 함수
+def rotateCommon(img, rot):
+    global log_msg, i_output
+
+    # 결과 이미지 패스 > 원본과 같은 폴더에서 파일 이름_rot로테이트 앵글
+    new_path = f"{CommonDef.getFileName(img)}_rot{rot}" + CommonDef.getFileExt(img)
+    i_output = os.path.join(CommonDef.getFileRoot(img), new_path)
+
+    if not os.path.isfile(img):
+        log_msg = "유효하지 않은 패스"
+        return False
+
+    if CommonDef.getFileExt(img).lower() not in possible_img_rotate:
+        log_msg = "지원하지 않는 파일 확장자(" + CommonDef.getFileExt(img) + ")"
+        return False
+
+    if not rot.isdigit():
+        log_msg = f"회전값 수치 오류({rot})"
+        return False
+
+    try:
+        if CommonDef.getFileExt(img).lower() != ".gif":
+            with Image.open(img) as im:
+                rotated_image = rotate_image(img, rot)
+                rotated_image.save(fp=i_output)
+
+        else:
+            rotate_gif(img, i_output, rot)
+
+        log_msg = "이미지 로테이트 완료"
+
+    except Exception as error_msg:
+        log_msg = f"이미지 로테이트 실패 {str(error_msg)}"
+        return False
+
+    return True
+
+
+if rotateCommon(i_input, i_rotate) == True:
+    CommonDef.makeLogTxt(i_output.replace("\\", "/").strip('"'), log_msg, log_dir, True)
+else:
+    CommonDef.makeLogTxt(
+        i_output.replace("\\", "/").strip('"'), log_msg, log_dir, False
+    )

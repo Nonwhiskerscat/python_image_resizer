@@ -61,7 +61,7 @@ class CommonDef:
         if bool == True:
             tpath = FileRoot.LogDir(parent, 3) + "/" + "clear.txt"
         else:
-            tpath = FileRoot.LogDir(parent, 3) + "/" + "error.txt"
+            tpath = FileRoot.LogDir(parent, 3) + "/" + "failed.txt"
         f = open(tpath, "a")
         f.write(str(DateTime.now) + " > " + path + " " + msg + "\n")
         f.close()

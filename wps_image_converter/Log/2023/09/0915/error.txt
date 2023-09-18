@@ -1,0 +1,2 @@
+2023-09-15 19:05:47.166165 > E:\workspace\python_image_resizer\image1.jpg 유효하지 않은 패스 포함
+2023-09-15 19:09:24.275863 > C:\Users\김서용\Desktop\image1.jpg GIF 이미지 생성 실패'JPEG'
