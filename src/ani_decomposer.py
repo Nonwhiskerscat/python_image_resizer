@@ -77,7 +77,7 @@ def aniDecompose(img, frmarr, cfrm):
 
     try:
         CommonDef.createDir(FileRoot.SubDir(i_root, CommonDef.getFileName(i_input)))
-        DeleteFile.DeleteAll(f"{i_root}/{CommonDef.getFileName(i_input)}")
+        DeleteCommon.All(f"{i_root}/{CommonDef.getFileName(i_input)}")
         frm_order = 0
         with Image.open(img) as im:
             for idx, frame in enumerate(ImageSequence.Iterator(im)):

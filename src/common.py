@@ -1,5 +1,6 @@
 import os
 import datetime as dt
+import shutil
 from PIL import Image
 
 # 파일 이동 시 수정 필수!!!!!!!!!!!!!!!!!!!!
@@ -95,16 +96,19 @@ class CommonDef:
             return im.n_frames
 
 
-class DeleteFile:
-    # 특정 파일 삭제(단일)
-    def DeleteFileAn(f_path):
+class DeleteCommon:
+    # 특정 파일 및 폴더 삭제(단일)
+    def One(f_path):
         try:
-            os.unlink(f_path)
+            if os.path.isfile(f_path):
+                os.unlink(f_path)
+            elif os.path.isdir(f_path):
+                shutil.rmtree(f_path)
         except Exception as e:
             print(f"파일 삭제 오류: {e}")
 
     # 특정 파일 삭제(배열 혹은 sys.argv)
-    def DeleteFileStr(f_paths):
+    def Multi(f_paths):
         for files in f_paths:
             try:
                 os.unlink(files)
@@ -112,7 +116,7 @@ class DeleteFile:
                 print(f"파일 삭제 오류: {e}")
 
     # 폴더 내 모든 파일 삭제
-    def DeleteAll(fo_path):
+    def All(fo_path):
         for files in os.listdir(fo_path):
             file_path = os.path.join(fo_path, files)
             try:
@@ -122,7 +126,7 @@ class DeleteFile:
                 print(f"파일 삭제 오류: {e}")
 
     # 폴더 내 특정 파일 삭제(확장자 기준)
-    def DeleteFileExt(fo_path, ext):
+    def CommonExt(fo_path, ext):
         # 폴더 내의 파일 목록 가져오기
         for files in os.listdir(fo_path):
             # 특정 확장자를 가진 파일인지 확인
@@ -135,7 +139,7 @@ class DeleteFile:
                 print(f"파일 삭제 오류: {e}")
 
     # 폴더 내 특정 파일 삭제(파일명 기준)
-    def DeleteFileKey(fo_path, keyword):
+    def CommonKey(fo_path, keyword):
         # 폴더 내의 파일 목록 가져오기
         for files in os.listdir(fo_path):
             # 특정 문자열을 포함하는 파일인지 확인
