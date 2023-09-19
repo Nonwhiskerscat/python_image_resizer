@@ -90,7 +90,7 @@ def isPath(i_input):
 
 def thumbnailResizer(i_input):
     global log_msg_t
-    thm_path = CommonDef.getFileName(i_input) + "t" + CommonDef.getFileExt(i_input)
+    thm_path = CommonDef.getFileName(i_input) + "_t" + CommonDef.getFileExt(i_input)
     thm_output = os.path.join(CommonDef.getFileRoot(i_input), thm_path)
 
     try:
@@ -112,7 +112,7 @@ def thumbnailResizer(i_input):
 
 def previewResizer(i_input):
     global log_msg_p
-    pre_path = CommonDef.getFileName(i_input) + "p" + CommonDef.getFileExt(i_input)
+    pre_path = CommonDef.getFileName(i_input) + "_p" + CommonDef.getFileExt(i_input)
     pre_output = os.path.join(CommonDef.getFileRoot(i_input), pre_path)
 
     try:
@@ -139,7 +139,7 @@ def freeResizer(i_input, width, height):
     if not height:
         height = (width / i_img.width) * i_img.height
 
-    free_path = f"{CommonDef.getFileName(i_input)}f_{width}_{int(height)}{CommonDef.getFileExt(i_input)}"
+    free_path = f"{CommonDef.getFileName(i_input)}_f_{width}_{int(height)}{CommonDef.getFileExt(i_input)}"
     free_output = os.path.join(CommonDef.getFileRoot(i_input), free_path)
 
     try:
@@ -160,42 +160,55 @@ def freeResizer(i_input, width, height):
     return True
 
 
+# 반복 최소화
+def changeCommon(cat):
+    if thumbnailResizer(cat):
+        CommonDef.makeLogTxt(cat, log_msg_t, log_dir, True)
+    else:
+        CommonDef.makeLogTxt(cat, log_msg_t, log_dir, False)
+
+    if previewResizer(cat):
+        CommonDef.makeLogTxt(cat, log_msg_p, log_dir, True)
+    else:
+        CommonDef.makeLogTxt(cat, log_msg_p, log_dir, False)
+
+
 def imgResizerCommon(i_input):
     if isPath(i_input) == True:
-        if i_arr[-2].isdigit() and i_arr[-1].isdigit():
-            if freeResizer(i_input, int(i_arr[-2]), int(i_arr[-1])):
-                CommonDef.makeLogTxt(i_input, log_msg_f, log_dir, True)
-            else:
-                CommonDef.makeLogTxt(i_input, log_msg_f, log_dir, False)
+        try:
+            if i_arr[-2].isdigit() and i_arr[-1].isdigit():
+                if freeResizer(i_input, int(i_arr[-2]), int(i_arr[-1])):
+                    CommonDef.makeLogTxt(i_input, log_msg_f, log_dir, True)
+                else:
+                    CommonDef.makeLogTxt(i_input, log_msg_f, log_dir, False)
 
-        elif i_arr[-1].isdigit():
-            if freeResizer(i_input, int(i_arr[-1]), None):
-                CommonDef.makeLogTxt(i_input, log_msg_f, log_dir, True)
-            else:
-                CommonDef.makeLogTxt(i_input, log_msg_f, log_dir, False)
+            elif i_arr[-1].isdigit():
+                if freeResizer(i_input, int(i_arr[-1]), None):
+                    CommonDef.makeLogTxt(i_input, log_msg_f, log_dir, True)
+                else:
+                    CommonDef.makeLogTxt(i_input, log_msg_f, log_dir, False)
 
-        else:
-            if thumbnailResizer(i_input) == True:
-                CommonDef.makeLogTxt(i_input, log_msg_t, log_dir, True)
             else:
-                CommonDef.makeLogTxt(i_input, log_msg_t, log_dir, False)
+                changeCommon(i_input)
 
-            if previewResizer(i_input) == True:
-                CommonDef.makeLogTxt(i_input, log_msg_p, log_dir, True)
-            else:
-                CommonDef.makeLogTxt(i_input, log_msg_p, log_dir, False)
+        except:
+            changeCommon(i_input)
+
     else:
         CommonDef.makeLogTxt(i_input, log_msg_i, log_dir, False)
 
 
-if CommonDef.isDigit(i_arr[-2]) and CommonDef.isDigit(i_arr[-1]):
-    for img in i_arr[0:-2]:
-        imgResizerCommon(img.replace("\\", "/").strip('"'))
+try:
+    if CommonDef.isDigit(i_arr[-2]) and CommonDef.isDigit(i_arr[-1]):
+        for img in i_arr[0:-2]:
+            imgResizerCommon(img.replace("\\", "/").strip('"'))
 
-elif CommonDef.isDigit(i_arr[-1]):
-    for img in i_arr[0:-1]:
-        imgResizerCommon(img.replace("\\", "/").strip('"'))
+    elif CommonDef.isDigit(i_arr[-1]):
+        for img in i_arr[0:-1]:
+            imgResizerCommon(img.replace("\\", "/").strip('"'))
 
-else:
-    for img in i_arr:
-        imgResizerCommon(img.replace("\\", "/").strip('"'))
+    else:
+        for img in i_arr:
+            imgResizerCommon(img.replace("\\", "/").strip('"'))
+except:
+    imgResizerCommon(i_arr[0].replace("\\", "/").strip('"'))

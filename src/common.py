@@ -144,7 +144,7 @@ class DeleteCommon:
         for files in os.listdir(fo_path):
             # 특정 문자열을 포함하는 파일인지 확인
             try:
-                if keyword in files:
+                if keyword in CommonDef.getFileName(files):
                     file_path = os.path.join(fo_path, files)
                     # 파일 삭제
                     os.unlink(file_path)
