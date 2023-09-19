@@ -1,10 +1,9 @@
-from imgpy import Img
-import datetime as dt
 import os
 import math
 import configparser
-from common import *
+from PIL import Image
 import sys
+from common import *
 
 # sys.argv[0] = file_name
 # sys.argv[1~-1] = image_files
@@ -27,6 +26,27 @@ for key in config["Image_TypeI"].keys():
 # 로그 파일 생성
 log_dir = config["LogFile_Route"]["root"]
 CommonDef.createDir(log_dir)
+
+
+# 정적 이미지 로테이트 메서드
+def resizeImg(img, size):
+    img_resized = img.resize(size)
+    return img_resized
+
+
+# 동적 이미지 로테이트 메서드
+def resizeGif(input, output, size):
+    with Image.open(input) as im:
+        frames = []
+
+        # 프레임 추출 및 각 프레임 회전
+        for frame in range(im.n_frames):
+            im.seek(frame)
+            resized_frame = resizeImg(im.copy(), size)
+            frames.append(resized_frame)
+
+        # 회전된 프레임을 새로운 GIF 파일로 저장
+        frames[0].save(output, save_all=True, append_images=frames[1:], loop=0)
 
 
 # 사이즈 조절 클래스
@@ -74,10 +94,15 @@ def thumbnailResizer(i_input):
     thm_output = os.path.join(CommonDef.getFileRoot(i_input), thm_path)
 
     try:
-        with Img(fp=i_input) as im:
-            im.resize(imageCustom._thumbnail_size(im))
-            im.save(fp=thm_output)
-            log_msg_t = "썸네일 변환 완료"
+        if CommonDef.getFileExt(i_input).lower() != ".gif":
+            with Image.open(i_input) as im:
+                resized_img = resizeImg(im, imageCustom._thumbnail_size(im))
+                resized_img.save(fp=thm_output)
+
+        else:
+            gif_img = Image.open(i_input)
+            resizeGif(i_input, thm_output, imageCustom._thumbnail_size(gif_img))
+        log_msg_t = "썸네일 변환 완료"
     except Exception as error_msg:
         log_msg_t = "썸네일 변환 실패 " + str(error_msg)
         return False
@@ -91,10 +116,16 @@ def previewResizer(i_input):
     pre_output = os.path.join(CommonDef.getFileRoot(i_input), pre_path)
 
     try:
-        with Img(fp=i_input) as im:
-            im.resize(imageCustom._preview_size(im))
-            im.save(fp=pre_output)
-            log_msg_p = "프리뷰 변환 완료"
+        if CommonDef.getFileExt(i_input).lower() != ".gif":
+            with Image.open(i_input) as im:
+                resized_img = resizeImg(im, imageCustom._preview_size(im))
+                resized_img.save(fp=pre_output)
+
+        else:
+            gif_img = Image.open(i_input)
+            resizeGif(i_input, pre_output, imageCustom._preview_size(gif_img))
+
+        log_msg_p = "프리뷰 변환 완료"
     except Exception as error_msg:
         log_msg_p = "프리뷰 변환 실패 " + str(error_msg)
         return False
@@ -102,20 +133,69 @@ def previewResizer(i_input):
     return True
 
 
+def freeResizer(i_input, width, height):
+    global log_msg_f
+    i_img = Image.open(i_input)
+    if not height:
+        height = (width / i_img.width) * i_img.height
+
+    free_path = f"{CommonDef.getFileName(i_input)}f_{width}_{int(height)}{CommonDef.getFileExt(i_input)}"
+    free_output = os.path.join(CommonDef.getFileRoot(i_input), free_path)
+
+    try:
+        if CommonDef.getFileExt(i_input).lower() != ".gif":
+            with Image.open(i_input) as im:
+                resized_img = resizeImg(im, (int(width), int(height)))
+                resized_img.save(fp=free_output)
+
+        else:
+            resizeGif(i_input, free_output, imageCustom._preview_size(i_img))
+
+        log_msg_f = f"이미지 리사이징 완료({width}, {int(height)})"
+
+    except Exception as error_msg:
+        log_msg_f = f"이미지 리사이징 실패 {str(error_msg)}"
+        return False
+
+    return True
+
+
 def imgResizerCommon(i_input):
     if isPath(i_input) == True:
-        if thumbnailResizer(i_input) == True:
-            CommonDef.makeLogTxt(i_input, log_msg_t, log_dir, True)
-        else:
-            CommonDef.makeLogTxt(i_input, log_msg_t, log_dir, False)
+        if i_arr[-2].isdigit() and i_arr[-1].isdigit():
+            if freeResizer(i_input, int(i_arr[-2]), int(i_arr[-1])):
+                CommonDef.makeLogTxt(i_input, log_msg_f, log_dir, True)
+            else:
+                CommonDef.makeLogTxt(i_input, log_msg_f, log_dir, False)
 
-        if previewResizer(i_input) == True:
-            CommonDef.makeLogTxt(i_input, log_msg_p, log_dir, True)
+        elif i_arr[-1].isdigit():
+            if freeResizer(i_input, int(i_arr[-1]), None):
+                CommonDef.makeLogTxt(i_input, log_msg_f, log_dir, True)
+            else:
+                CommonDef.makeLogTxt(i_input, log_msg_f, log_dir, False)
+
         else:
-            CommonDef.makeLogTxt(i_input, log_msg_p, log_dir, False)
+            if thumbnailResizer(i_input) == True:
+                CommonDef.makeLogTxt(i_input, log_msg_t, log_dir, True)
+            else:
+                CommonDef.makeLogTxt(i_input, log_msg_t, log_dir, False)
+
+            if previewResizer(i_input) == True:
+                CommonDef.makeLogTxt(i_input, log_msg_p, log_dir, True)
+            else:
+                CommonDef.makeLogTxt(i_input, log_msg_p, log_dir, False)
     else:
         CommonDef.makeLogTxt(i_input, log_msg_i, log_dir, False)
 
 
-for img in i_arr:
-    imgResizerCommon(img.replace("\\", "/").strip('"'))
+if CommonDef.isDigit(i_arr[-2]) and CommonDef.isDigit(i_arr[-1]):
+    for img in i_arr[0:-2]:
+        imgResizerCommon(img.replace("\\", "/").strip('"'))
+
+elif CommonDef.isDigit(i_arr[-1]):
+    for img in i_arr[0:-1]:
+        imgResizerCommon(img.replace("\\", "/").strip('"'))
+
+else:
+    for img in i_arr:
+        imgResizerCommon(img.replace("\\", "/").strip('"'))
