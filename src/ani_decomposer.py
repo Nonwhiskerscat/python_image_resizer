@@ -10,11 +10,13 @@ i_input = sys.argv[1].replace("\\", "/").strip('"')
 
 # 입력된 프레임 수
 c_frames = sys.argv[-1]
+i_frames = CommonDef.aniFrames(i_input)
 
-if not c_frames.isdigit():
+if c_frames == "*":
+    c_frames = i_frames
+elif not c_frames.isdigit():
     c_frames = 0
 # 원본 이미지의 전체 프레임 수
-i_frames = CommonDef.aniFrames(i_input)
 
 # 파일 위치
 i_root = os.path.dirname(i_input)
