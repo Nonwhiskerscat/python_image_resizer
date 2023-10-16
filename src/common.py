@@ -1,47 +1,60 @@
+# 일부 라이브러리 불러오기
 import os
 import datetime as dt
 import shutil
+import ctypes
+import configparser
 from PIL import Image
 
-# 파일 이동 시 수정 필수!!!!!!!!!!!!!!!!!!!!
+config = configparser.ConfigParser()
 
 
+# 날짜 관련 객체 > DateTime
 class DateTime:
     now = dt.datetime.now()
 
 
+# 파일 경로 관련 객체 > FileRoot
 class FileRoot:
     program_dirname = (
         os.path.abspath("./Desktop/wps_image_converter").replace("\\", "/").strip('"')
-    )
-    in_root = program_dirname + "/Program/image_custom.ini"
-    in_root = os.path.abspath(in_root)
+    )  # exe 파일 경로(절대경로화)
+    in_root = program_dirname + "/Program/image_custom.ini"  # ini 파일 경로
+    in_root = os.path.abspath(in_root)  # ini 파일 절대 경로화
 
+    ### ini 파일 위치는 exe 프로그램과 같은 경로에 위치해야 한다. 그렇지 않으면 프로그램 자체가 돌아가지 않는다. ###
+    ### 다만 ini 파일 경로 중간에 PC 이름을 수정해줘야 프로그램을 정상적으로 사용할 수 있다. ###
+
+    # 로그 폴더 경로
     def LogDir(parent, idx):
-        logY_dir = parent + "/" + str(DateTime.now.year)
-        logM_dir = logY_dir + "/" + str(DateTime.now.month).zfill(2)
+        logY_dir = parent + "/" + str(DateTime.now.year)  # Year 폴더 위치(yyyy)
+        logM_dir = logY_dir + "/" + str(DateTime.now.month).zfill(2)  # Month 폴더 위치(mm)
         logD_dir = (
             logM_dir
             + "/"
             + str(DateTime.now.month).zfill(2)
             + str(DateTime.now.day).zfill(2)
-        )
+        )  # Day 폴더 위치(mmdd)
 
-        if idx == 1:
-            return logY_dir
-        elif idx == 2:
-            return logM_dir
-        elif idx == 3:
-            return logD_dir
+        # 메서드 호출 시
+        if idx == 1:  # idx가 1이면
+            return logY_dir  # Year 폴더 생성
+        elif idx == 2:  # idx가 2면
+            return logM_dir  # Month 폴더 생성
+        elif idx == 3:  # idx가 3이면
+            return logD_dir  # Day 폴더 생성
 
+    # Root 폴더 cwd 생성 메서드
     def RootDir(cwd):
         return cwd.replace("\\", "/").strip('"')
 
+    # Root 폴더 cwd 아래 이름이 type인 SubDir 생성 메서드
     def SubDir(cwd, type):
         sub_dir = f"{FileRoot.RootDir(cwd)}/{type}"
         return sub_dir
 
 
+# 공용으로 사용하는 메서드 저장용 객체
 class CommonDef:
     # 폴더 생성 메서드
     def createDir(path):
@@ -81,8 +94,8 @@ class CommonDef:
         file_name, _ = os.path.splitext(base_name)
         return file_name
 
-    # isdit 커스텀 함수
-    ## 기존의 isdigit()가 음수 혹은 float를 False 처리해버리기 때문에 어쩔 수 없이 만든 함수...
+    # isdit 커스텀 메서드
+    ## 기존의 isdigit()가 음수 혹은 float를 False 처리해버리기 때문에 어쩔 수 없이 만든 메서드...
     def isDigit(str):
         try:
             cat = float(str)
@@ -90,12 +103,17 @@ class CommonDef:
         except ValueError:
             return False
 
-    # Gif 이미지의 프레임 개수를 리턴하는 함수
+    # Gif 이미지의 프레임 개수를 리턴하는 메서드
     def aniFrames(img):
         with Image.open(img) as im:
             return im.n_frames
 
+    # 에러 메시지를 생성하는 메서드
+    def Errormsg(handle, msg, title, type):
+        ctypes.windll.user32.MessageBoxW(handle, msg, title, type)
 
+
+# 폴더 및 파일 삭제 관련 메서드를 저장한 객체
 class DeleteCommon:
     # 특정 파일 및 폴더 삭제(단일)
     def One(f_path):
@@ -150,3 +168,9 @@ class DeleteCommon:
                     os.unlink(file_path)
             except Exception as e:
                 print(f"파일 삭제 오류: {e}")
+
+
+e_log_msg = f"{CommonDef.getFileName(FileRoot.in_root)} 파일이 누락되어 있습니다."
+
+if not os.path.isdir(FileRoot.in_root):
+    CommonDef.Errormsg(0, e_log_msg, "에러 발생", 16)

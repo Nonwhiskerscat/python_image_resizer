@@ -1,17 +1,14 @@
+# 일부 라이브러리 불러오기
 import configparser
-import datetime as dt
-import os
 from common import *
 
 # ConfigParser 객체 생성
 config = configparser.ConfigParser()
 
-# 프로그램 지원 가능 확장자
+# 이미지 확장자
+## Image_TypeI은 대부분 프로그램에서 사용
 config["Image_TypeI"] = {}
 Image_TypeI = config["Image_TypeI"]
-
-if not "Image_TypeI" in config:
-    print("config['Image_TypeI'] not exist")
 
 pos_img_arr_1 = [
     ".jpg",
@@ -22,11 +19,13 @@ pos_img_arr_1 = [
     ".gif",
 ]
 
+# pos_img_arr 값을 Image_TypeI에 저장
 for ftype in pos_img_arr_1:
     Image_TypeI[ftype] = ftype
 
 
 # 움짤 전용 확장자
+## Image_TypeI은 대부분 프로그램에서 사용
 config["Ani_Image"] = {}
 Ani_Image = config["Ani_Image"]
 

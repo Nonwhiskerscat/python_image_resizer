@@ -55,6 +55,7 @@ def cropImg(i_input, x1, y1, x2, y2):
         return False
 
     # 이미지 사이즈 구하기
+
     i_obj = Image.open(i_input)
     i_width, i_height = i_obj.size
 
