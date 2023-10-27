@@ -28,13 +28,13 @@ log_dir = config["LogFile_Route"]["root"]
 CommonDef.createDir(log_dir)
 
 
-# 정적 이미지 로테이트 메서드
+# 정적 이미지 리사이즈 메서드
 def resizeImg(img, size):
     img_resized = img.resize(size)
     return img_resized
 
 
-# 동적 이미지 로테이트 메서드
+# 동적 이미지 리사이즈 메서드
 def resizeGif(input, output, size):
     with Image.open(input) as im:
         frames = []
@@ -88,56 +88,65 @@ def isPath(i_input):
         return True
 
 
-def thumbnailResizer(i_input):
-    global log_msg_t
-    thm_path = CommonDef.getFileName(i_input) + "_t" + CommonDef.getFileExt(i_input)
-    thm_output = os.path.join(CommonDef.getFileRoot(i_input), thm_path)
+def resize_image(image, output_path, custom_width, size_function):
+    if image.width < custom_width:
+        return image
+    return resizeImg(image, size_function(image))
+
+
+def save_image(image, output_path):
+    image.save(fp=output_path)
+
+
+def process_image(i_input, custom_width, size_function, log_msg):
+    global log_msg_t, log_msg_p
+
+    path_suffix = "_t" if log_msg == "썸네일 변환 완료" else "_p"
+    output_path = os.path.join(
+        CommonDef.getFileRoot(i_input),
+        CommonDef.getFileName(i_input) + path_suffix + CommonDef.getFileExt(i_input),
+    )
 
     try:
-        if CommonDef.getFileExt(i_input).lower() != ".gif":
-            with Image.open(i_input) as im:
-                resized_img = resizeImg(im, imageCustom._thumbnail_size(im))
-                resized_img.save(fp=thm_output)
+        ext = CommonDef.getFileExt(i_input).lower()
+        with Image.open(i_input) as im:
+            resized_img = resize_image(im, output_path, custom_width, size_function)
+            save_image(resized_img, output_path)
 
+        if log_msg == "썸네일 변환 완료":
+            log_msg_t = "썸네일 변환 완료"
         else:
-            gif_img = Image.open(i_input)
-            resizeGif(i_input, thm_output, imageCustom._thumbnail_size(gif_img))
-        log_msg_t = "썸네일 변환 완료"
+            log_msg_p = "프리뷰 변환 완료"
     except Exception as error_msg:
-        log_msg_t = "썸네일 변환 실패 " + str(error_msg)
+        if log_msg == "썸네일 변환 완료":
+            log_msg_t = "썸네일 변환 실패 " + str(error_msg)
+        else:
+            log_msg_p = "프리뷰 변환 실패 " + str(error_msg)
         return False
 
     return True
+
+
+def thumbnailResizer(i_input):
+    return process_image(
+        i_input, imageCustom.thumbnail_width, imageCustom._thumbnail_size, "썸네일 변환 완료"
+    )
 
 
 def previewResizer(i_input):
-    global log_msg_p
-    pre_path = CommonDef.getFileName(i_input) + "_p" + CommonDef.getFileExt(i_input)
-    pre_output = os.path.join(CommonDef.getFileRoot(i_input), pre_path)
-
-    try:
-        if CommonDef.getFileExt(i_input).lower() != ".gif":
-            with Image.open(i_input) as im:
-                resized_img = resizeImg(im, imageCustom._preview_size(im))
-                resized_img.save(fp=pre_output)
-
-        else:
-            gif_img = Image.open(i_input)
-            resizeGif(i_input, pre_output, imageCustom._preview_size(gif_img))
-
-        log_msg_p = "프리뷰 변환 완료"
-    except Exception as error_msg:
-        log_msg_p = "프리뷰 변환 실패 " + str(error_msg)
-        return False
-
-    return True
+    return process_image(
+        i_input, imageCustom.preview_width, imageCustom._preview_size, "프리뷰 변환 완료"
+    )
 
 
 def freeResizer(i_input, width, height):
     global log_msg_f
     i_img = Image.open(i_input)
-    if not height:
+    if height == 0:
         height = (width / i_img.width) * i_img.height
+
+    if width == 0:
+        width = (height / i_img.height) * i_img.width
 
     free_path = f"{CommonDef.getFileName(i_input)}_f_{width}_{int(height)}{CommonDef.getFileExt(i_input)}"
     free_output = os.path.join(CommonDef.getFileRoot(i_input), free_path)
@@ -149,7 +158,7 @@ def freeResizer(i_input, width, height):
                 resized_img.save(fp=free_output)
 
         else:
-            resizeGif(i_input, free_output, imageCustom._preview_size(i_img))
+            resizeGif(i_input, free_output, (int(width), int(height)))
 
         log_msg_f = f"이미지 리사이징 완료({width}, {int(height)})"
 

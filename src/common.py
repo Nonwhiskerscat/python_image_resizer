@@ -170,7 +170,7 @@ class DeleteCommon:
                 print(f"파일 삭제 오류: {e}")
 
 
-e_log_msg = f"{CommonDef.getFileName(FileRoot.in_root)} 파일이 누락되어 있습니다."
+# e_log_msg = f"{CommonDef.getFileName(FileRoot.in_root)} 파일이 누락되어 있습니다."
 
-if not os.path.isdir(FileRoot.in_root):
-    CommonDef.Errormsg(0, e_log_msg, "에러 발생", 16)
+# if not os.path.isdir(FileRoot.in_root):
+#     CommonDef.Errormsg(0, e_log_msg, "에러 발생", 16)
