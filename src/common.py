@@ -17,13 +17,12 @@ class DateTime:
 # 파일 경로 관련 객체 > FileRoot
 class FileRoot:
     program_dirname = (
-        os.path.abspath("./Desktop/wps_image_converter").replace("\\", "/").strip('"')
+        # os.path.abspath("./Desktop/wps_image_converter").replace("\\", "/").strip('"')
     )  # exe 파일 경로(절대경로화)
-    in_root = program_dirname + "/Program/image_custom.ini"  # ini 파일 경로
-    in_root = os.path.abspath(in_root)  # ini 파일 절대 경로화
+    in_root = "./image_custom.ini"  # ini 파일 경로
+    # in_root = os.path.abspath(in_root)  # ini 파일 절대 경로화
 
     ### ini 파일 위치는 exe 프로그램과 같은 경로에 위치해야 한다. 그렇지 않으면 프로그램 자체가 돌아가지 않는다. ###
-    ### 다만 ini 파일 경로 중간에 PC 이름을 수정해줘야 프로그램을 정상적으로 사용할 수 있다. ###
 
     # 로그 폴더 경로
     def LogDir(parent, idx):

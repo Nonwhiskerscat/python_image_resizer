@@ -1,7 +1,7 @@
 import os
 import math
 import configparser
-from PIL import Image
+from PIL import Image, ImageSequence
 import sys
 from common import *
 
@@ -89,9 +89,10 @@ def isPath(i_input):
 
 
 def resize_image(image, output_path, custom_width, size_function):
+    new_size = size_function(image)
     if image.width < custom_width:
         return image
-    return resizeImg(image, size_function(image))
+    return resizeImg(image, new_size)
 
 
 def save_image(image, output_path):
@@ -110,8 +111,16 @@ def process_image(i_input, custom_width, size_function, log_msg):
     try:
         ext = CommonDef.getFileExt(i_input).lower()
         with Image.open(i_input) as im:
-            resized_img = resize_image(im, output_path, custom_width, size_function)
-            save_image(resized_img, output_path)
+            if ext == ".gif":
+                frames = [
+                    resize_image(frame, output_path, custom_width, size_function)
+                    for frame in ImageSequence.Iterator(im)
+                ]
+                new_im = frames[0].copy()
+                new_im.save(output_path, save_all=True, append_images=frames[1:])
+            else:
+                resized_img = resize_image(im, output_path, custom_width, size_function)
+                save_image(resized_img, output_path)
 
         if log_msg == "썸네일 변환 완료":
             log_msg_t = "썸네일 변환 완료"
