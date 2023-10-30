@@ -42,7 +42,7 @@ for key in config["Ani_Image"].keys():
     possible_gif_decom.append(key)
 
 # 로그 파일 주소 가져오기
-log_dir = config["LogFile_Route"]["root"]
+log_dir = FileRoot.log_root
 # 로그 파일 여부 확인 및 생성
 CommonDef.createDir(log_dir)
 

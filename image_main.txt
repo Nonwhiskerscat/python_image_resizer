@@ -1,0 +1,10 @@
+모든 파일 exe 업데이트 시 아래 구문 입력
+
+pyinstaller -F ./src/ani_decomposer.py
+pyinstaller -F ./src/del_files.py
+pyinstaller -F ./src/image_cropper.py
+pyinstaller -F ./src/image_flipper.py
+pyinstaller -F ./src/image_gifmaker.py
+pyinstaller -F ./src/image_resizer.py
+pyinstaller -F ./src/image_rotator.py
+pyinstaller -F ./src/image_watermark.py

@@ -22,7 +22,7 @@ for key in config["Image_TypeI"].keys():
     possible_img_flip.append(key)
 
 # 로그 파일 생성 및 여부
-log_dir = config["LogFile_Route"]["root"]
+log_dir = FileRoot.log_root
 CommonDef.createDir(log_dir)
 
 

@@ -1,5 +1,6 @@
 # 일부 라이브러리 불러오기
 import os
+import sys
 import datetime as dt
 import shutil
 import ctypes
@@ -16,11 +17,11 @@ class DateTime:
 
 # 파일 경로 관련 객체 > FileRoot
 class FileRoot:
-    program_dirname = (
-        # os.path.abspath("./Desktop/wps_image_converter").replace("\\", "/").strip('"')
-    )  # exe 파일 경로(절대경로화)
-    in_root = "./image_custom.ini"  # ini 파일 경로
-    # in_root = os.path.abspath(in_root)  # ini 파일 절대 경로화
+    program_dirname = os.path.abspath(sys.argv[0])
+    # custom.ini 파일의 경로
+    in_root = os.path.join(os.path.dirname(program_dirname), "image_custom.ini")
+    log_root = os.path.join(os.path.dirname(os.path.dirname(program_dirname)), "Log")
+    water_root = os.path.join(os.path.dirname(program_dirname), "Watermark")
 
     ### ini 파일 위치는 exe 프로그램과 같은 경로에 위치해야 한다. 그렇지 않으면 프로그램 자체가 돌아가지 않는다. ###
 
@@ -28,12 +29,7 @@ class FileRoot:
     def LogDir(parent, idx):
         logY_dir = parent + "/" + str(DateTime.now.year)  # Year 폴더 위치(yyyy)
         logM_dir = logY_dir + "/" + str(DateTime.now.month).zfill(2)  # Month 폴더 위치(mm)
-        logD_dir = (
-            logM_dir
-            + "/"
-            + str(DateTime.now.month).zfill(2)
-            + str(DateTime.now.day).zfill(2)
-        )  # Day 폴더 위치(mmdd)
+        logD_dir = logM_dir + "/" + str(DateTime.now.day).zfill(2)  # Day 폴더 위치(mmdd)
 
         # 메서드 호출 시
         if idx == 1:  # idx가 1이면

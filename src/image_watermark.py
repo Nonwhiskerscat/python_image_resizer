@@ -28,10 +28,12 @@ for key in config["Water_Idx"].keys():
 if w_idx not in possible_img_idx:
     w_idx = "1"
 
-w_path = config["Water_Route"][w_idx]
+w_path = config["Water_Img"][w_idx]
+
+w_ent_path = os.path.join(FileRoot.water_root, w_path)
 
 # 로그 파일 생성
-log_dir = config["LogFile_Route"]["root"]
+log_dir = FileRoot.log_root
 CommonDef.createDir(log_dir)
 
 
@@ -105,7 +107,7 @@ w_opacity = float(config["Water_Opacity"][w_idx])
 # watermarkForImg(i_path, w_path, w_opacity)
 
 
-if watermarkForImg(i_path, w_path, w_opacity) == True:
+if watermarkForImg(i_path, w_ent_path, w_opacity) == True:
     CommonDef.makeLogTxt(i_output, log_msg, log_dir, True)
 else:
     CommonDef.makeLogTxt(i_output, log_msg, log_dir, False)
