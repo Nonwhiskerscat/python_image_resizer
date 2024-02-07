@@ -5,9 +5,12 @@ import datetime as dt
 import shutil
 import ctypes
 import configparser
-from PIL import Image
+from PIL import Image, ExifTags
 
 config = configparser.ConfigParser()
+
+class ProgramRes:
+    pass
 
 
 # 날짜 관련 객체 > DateTime
@@ -74,6 +77,8 @@ class CommonDef:
         f.write(str(DateTime.now) + " > " + path + " " + msg + "\n")
         f.close()
 
+        return bool, msg
+
     # 파일 주소 추출
     def getFileRoot(i_path):
         return os.path.dirname(i_path)
@@ -89,6 +94,19 @@ class CommonDef:
         file_name, _ = os.path.splitext(base_name)
         return file_name
 
+    # dpi 값 추출
+    def getDPI(image, default_dpi=72) :
+        # 이미지의 메타데이터 가져오기
+        try:
+            dpi_infoX, dpi_InfoY = image.info["dpi"]
+            return dpi_infoX
+
+        except (AttributeError, KeyError, TypeError):
+            pass
+
+        return default_dpi # 이미지의 DPI 정보가 메타데이터에 포함되어 있지 않는 경우 72를 리턴한다.(디폴트 값이 72이기 때문)
+
+    
     # isdit 커스텀 메서드
     ## 기존의 isdigit()가 음수 혹은 float를 False 처리해버리기 때문에 어쩔 수 없이 만든 메서드...
     def isDigit(str):

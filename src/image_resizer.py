@@ -5,6 +5,8 @@ from PIL import Image, ImageSequence
 import sys
 from common import *
 
+imageRes = ProgramRes()
+
 # sys.argv[0] = file_name
 # sys.argv[1~-1] = image_files
 
@@ -14,7 +16,6 @@ del i_arr[0]
 
 # ConfigParser 객체 생성
 config = configparser.ConfigParser()
-
 
 # 자동화
 possible_img_resize = []
@@ -90,19 +91,26 @@ def isPath(i_input):
 
 def resize_image(image, output_path, custom_width, size_function):
     new_size = size_function(image)
+    imageRes.sizeX = image.width
+    imageRes.sizeY = image.height
+    imageRes.Resolution = f"{imageRes.sizeX}*{imageRes.sizeY}"
+
     if image.width < custom_width:
         return image
+    
+
     return resizeImg(image, new_size)
+
 
 
 def save_image(image, output_path):
     image.save(fp=output_path)
 
 
-def process_image(i_input, custom_width, size_function, log_msg):
+def process_image(i_input, custom_width, size_function, type):
     global log_msg_t, log_msg_p
 
-    path_suffix = "_t" if log_msg == "썸네일 변환 완료" else "_p"
+    path_suffix = "t" if type == "thm" else "p"
     output_path = os.path.join(
         CommonDef.getFileRoot(i_input),
         CommonDef.getFileName(i_input) + path_suffix + CommonDef.getFileExt(i_input),
@@ -111,6 +119,8 @@ def process_image(i_input, custom_width, size_function, log_msg):
     try:
         ext = CommonDef.getFileExt(i_input).lower()
         with Image.open(i_input) as im:
+            idpi = CommonDef.getDPI(im)
+            imageRes.iDpi = idpi
             if ext == ".gif":
                 frames = [
                     resize_image(frame, output_path, custom_width, size_function)
@@ -122,12 +132,12 @@ def process_image(i_input, custom_width, size_function, log_msg):
                 resized_img = resize_image(im, output_path, custom_width, size_function)
                 save_image(resized_img, output_path)
 
-        if log_msg == "썸네일 변환 완료":
+        if type == "thm":
             log_msg_t = "썸네일 변환 완료"
         else:
             log_msg_p = "프리뷰 변환 완료"
     except Exception as error_msg:
-        if log_msg == "썸네일 변환 완료":
+        if type == "thm":
             log_msg_t = "썸네일 변환 실패 " + str(error_msg)
         else:
             log_msg_p = "프리뷰 변환 실패 " + str(error_msg)
@@ -138,13 +148,12 @@ def process_image(i_input, custom_width, size_function, log_msg):
 
 def thumbnailResizer(i_input):
     return process_image(
-        i_input, imageCustom.thumbnail_width, imageCustom._thumbnail_size, "썸네일 변환 완료"
+        i_input, imageCustom.thumbnail_width, imageCustom._thumbnail_size, "thm"
     )
-
 
 def previewResizer(i_input):
     return process_image(
-        i_input, imageCustom.preview_width, imageCustom._preview_size, "프리뷰 변환 완료"
+        i_input, imageCustom.preview_width, imageCustom._preview_size, "pre"
     )
 
 
@@ -181,14 +190,16 @@ def freeResizer(i_input, width, height):
 # 반복 최소화
 def changeCommon(cat):
     if thumbnailResizer(cat):
-        CommonDef.makeLogTxt(cat, log_msg_t, log_dir, True)
+        imageRes.res = CommonDef.makeLogTxt(cat, log_msg_t, log_dir, True)
+        
     else:
-        CommonDef.makeLogTxt(cat, log_msg_t, log_dir, False)
+        imageRes.res = CommonDef.makeLogTxt(cat, log_msg_t, log_dir, False)
+        imageRes.res = False
 
     if previewResizer(cat):
-        CommonDef.makeLogTxt(cat, log_msg_p, log_dir, True)
+        imageRes.res = CommonDef.makeLogTxt(cat, log_msg_p, log_dir, True)
     else:
-        CommonDef.makeLogTxt(cat, log_msg_p, log_dir, False)
+        imageRes.res = CommonDef.makeLogTxt(cat, log_msg_p, log_dir, False)
 
 
 def imgResizerCommon(i_input):
@@ -196,15 +207,15 @@ def imgResizerCommon(i_input):
         try:
             if i_arr[-2].isdigit() and i_arr[-1].isdigit():
                 if freeResizer(i_input, int(i_arr[-2]), int(i_arr[-1])):
-                    CommonDef.makeLogTxt(i_input, log_msg_f, log_dir, True)
+                    imageRes.res = CommonDef.makeLogTxt(i_input, log_msg_f, log_dir, True)
                 else:
-                    CommonDef.makeLogTxt(i_input, log_msg_f, log_dir, False)
+                    imageRes.res = CommonDef.makeLogTxt(i_input, log_msg_f, log_dir, False)
 
             elif i_arr[-1].isdigit():
                 if freeResizer(i_input, int(i_arr[-1]), None):
-                    CommonDef.makeLogTxt(i_input, log_msg_f, log_dir, True)
+                    imageRes.res = CommonDef.makeLogTxt(i_input, log_msg_f, log_dir, True)
                 else:
-                    CommonDef.makeLogTxt(i_input, log_msg_f, log_dir, False)
+                    imageRes.res = CommonDef.makeLogTxt(i_input, log_msg_f, log_dir, False)
 
             else:
                 changeCommon(i_input)
@@ -213,7 +224,7 @@ def imgResizerCommon(i_input):
             changeCommon(i_input)
 
     else:
-        CommonDef.makeLogTxt(i_input, log_msg_i, log_dir, False)
+        imageRes.res = CommonDef.makeLogTxt(i_input, log_msg_i, log_dir, False)
 
 
 try:
@@ -230,3 +241,10 @@ try:
             imgResizerCommon(img.replace("\\", "/").strip('"'))
 except:
     imgResizerCommon(i_arr[0].replace("\\", "/").strip('"'))
+
+if(imageRes.res[0] == True):
+    print(f"SUCCESS|{imageRes.sizeX}|{imageRes.sizeY}|{imageRes.iDpi}")
+else:
+    print(f"FAILED|{imageRes.res[1]}")
+
+# os.system("pause")
