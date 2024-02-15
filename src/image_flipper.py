@@ -54,8 +54,6 @@ def flipImg(input, f_idx):
 # 동적 이미지 플립 매서드
 def flipGif(input, output, f_idx):
     with Image.open(input) as im:
-        imageRes.sizeX = im.width
-        imageRes.sizeY = im.height
         idpi = CommonDef.getDPI(im)
         imageRes.iDpi = idpi
         frames = []
@@ -102,6 +100,10 @@ def flipCommon(img, f_idx):
 
                 file_size = os.path.getsize(i_output)
                 imageRes.fileSize = file_size
+
+                with Image.open(i_output):
+                    imageRes.sizeX = im.width
+                    imageRes.sizeY = im.height
 
         # 이미지 형식이 Gif일 때
         else:

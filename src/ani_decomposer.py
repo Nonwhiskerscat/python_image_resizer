@@ -3,6 +3,9 @@ import os
 import configparser
 import sys
 from PIL import Image, ImageSequence
+from common import *
+
+imageRes = ProgramRes()
 
 # 공용 파일 불러오기
 from common import *
@@ -110,6 +113,14 @@ def aniDecompose(img, frmarr, cfrm):
                     # 해당 프레임 이미지 저장(파일 형식_png)
                     i_output = f"{i_root}/{CommonDef.getFileName(i_input)}/frames_{frm_order}.png"
                     frame.save(i_output, format="PNG")
+
+                    if(frm_order==0):
+                        file_size = os.path.getsize(i_output)
+                        imageRes.fileSize = file_size
+                        imageRes.sizeX = im.width
+                        imageRes.sizeY = im.height
+                        idpi = CommonDef.getDPI(im)
+                        imageRes.iDpi = idpi
                     frm_order += 1
 
             log_msg = f"이미지 파싱 완료(프레임 수: {c_frames})"
@@ -129,8 +140,13 @@ target_frames = setFrameNum(int(c_frames), i_frames)
 # aniDecompose 값 실행
 ## 해당 메서드 값이 True일 경우 clear.txt에 로그 기록
 if aniDecompose(i_input, target_frames, c_frames):
-    CommonDef.makeLogTxt(i_input.replace("\\", "/").strip('"'), log_msg, log_dir, True)
+    imageRes.res = CommonDef.makeLogTxt(i_input.replace("\\", "/").strip('"'), log_msg, log_dir, True)
 
 ## 해당 메서드 값이 False일 경우 failed.txt에 로그 기록
 else:
-    CommonDef.makeLogTxt(i_input.replace("\\", "/").strip('"'), log_msg, log_dir, False)
+    imageRes.res = CommonDef.makeLogTxt(i_input.replace("\\", "/").strip('"'), log_msg, log_dir, False)
+
+if(imageRes.res[0] == True):
+    print(f"SUCCESS|{imageRes.sizeX}|{imageRes.sizeY}|{int(imageRes.iDpi)}|{int(imageRes.fileSize)}")
+else:
+    print(f"FAILED|{imageRes.res[1]}")

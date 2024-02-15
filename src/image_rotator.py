@@ -37,8 +37,6 @@ def rotateImg(img, angle):
 def rotateGif(input, output, angle):
     with Image.open(input) as im:
         frames = []
-        imageRes.sizeX = im.width
-        imageRes.sizeY = im.height
         idpi = CommonDef.getDPI(im)
         imageRes.iDpi = idpi
 
@@ -90,6 +88,9 @@ def rotateCommon(img, rot):
                 file_size = os.path.getsize(i_output)
                 imageRes.fileSize = file_size
 
+                with Image.open(i_output):
+                    imageRes.sizeX = im.width
+                    imageRes.sizeY = im.height
         # 이미지 형식이 Gif일 때
         else:
             rotateGif(img, i_output, rot)

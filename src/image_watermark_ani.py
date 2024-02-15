@@ -57,8 +57,6 @@ def watermarkForGif(i_input, w_image, w_opacity):
     with Image.open(i_input) as im:
         imageRes.sizeX = im.width
         imageRes.sizeY = im.height
-        idpi = CommonDef.getDPI(im)
-        imageRes.iDpi = idpi
         original_gif = Image.open(i_input)
 
 
@@ -108,6 +106,9 @@ def watermarkForGif(i_input, w_image, w_opacity):
         log_msg = "워터마크 GIF 이미지 제작 완료"
         file_size = os.path.getsize(i_output)
         imageRes.fileSize = file_size
+        with Image.open(i_output) as im:
+            idpi = CommonDef.getDPI(im)
+            imageRes.iDpi = idpi
         return True
     except Exception as error_msg:
         log_msg = "에러 발생: " + str(error_msg)
