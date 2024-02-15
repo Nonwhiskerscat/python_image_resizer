@@ -243,7 +243,7 @@ except:
     imgResizerCommon(i_arr[0].replace("\\", "/").strip('"'))
 
 if(imageRes.res[0] == True):
-    print(f"SUCCESS|{imageRes.sizeX}|{imageRes.sizeY}|{imageRes.iDpi}")
+    print(f"SUCCESS|{imageRes.sizeX}|{imageRes.sizeY}|{int(imageRes.iDpi)}")
 else:
     print(f"FAILED|{imageRes.res[1]}")
 

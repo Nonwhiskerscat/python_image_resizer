@@ -5,12 +5,13 @@ from imgpy import Img
 from PIL import Image, ImageSequence
 from common import *
 
+imageRes = ProgramRes()
+
 # 이미지 파일
 i_input = sys.argv[1].replace("\\", "/").strip('"')
 
 # 이미지 플립 idx
 flip_idx = sys.argv[-1]  # 이미지 플립 idx
-
 
 # ini 파일 읽어오기
 config = configparser.ConfigParser()
@@ -53,6 +54,10 @@ def flipImg(input, f_idx):
 # 동적 이미지 플립 매서드
 def flipGif(input, output, f_idx):
     with Image.open(input) as im:
+        imageRes.sizeX = im.width
+        imageRes.sizeY = im.height
+        idpi = CommonDef.getDPI(im)
+        imageRes.iDpi = idpi
         frames = []
 
         # 프레임 추출 및 각 프레임 플립
@@ -63,13 +68,14 @@ def flipGif(input, output, f_idx):
 
         # 플립된 프레임을 새로운 GIF 파일로 저장
         frames[0].save(output, save_all=True, append_images=frames[1:], loop=0)
-
+        file_size = os.path.getsize(output)
+        imageRes.fileSize = file_size
 
 def flipCommon(img, f_idx):
     global log_msg, i_output
 
-    # 결과 이미지 패스 > 원본과 같은 폴더에서 파일 이름_rot로테이트 앵글
-    new_path = f"{CommonDef.getFileName(img)}_flip{f_idx}{CommonDef.getFileExt(img)}"
+    # 결과 이미지 패스 > 원본과 같은 폴더에서 파일 이름
+    new_path = f"{CommonDef.getFileName(img)}f{f_idx}{CommonDef.getFileExt(img)}"
     i_output = os.path.join(CommonDef.getFileRoot(img), new_path)
 
     # 입력된 패스가 유효하지 않을 때
@@ -86,8 +92,16 @@ def flipCommon(img, f_idx):
         # 이미지 형식이 Gif가 아닐 때
         if CommonDef.getFileExt(img).lower() != ".gif":
             with Image.open(img) as im:
+                imageRes.sizeX = im.width
+                imageRes.sizeY = im.height
+                idpi = CommonDef.getDPI(im)
+                imageRes.iDpi = idpi
+                
                 flipped_img = flipImg(im, f_idx)
                 flipped_img.save(fp=i_output)
+
+                file_size = os.path.getsize(i_output)
+                imageRes.fileSize = file_size
 
         # 이미지 형식이 Gif일 때
         else:
@@ -105,8 +119,14 @@ def flipCommon(img, f_idx):
 
 # 로그 파일 업데이트
 if flipCommon(i_input, flip_idx) == True:
-    CommonDef.makeLogTxt(i_output.replace("\\", "/").strip('"'), log_msg, log_dir, True)
+    imageRes.res = CommonDef.makeLogTxt(i_output.replace("\\", "/").strip('"'), log_msg, log_dir, True)
 else:
-    CommonDef.makeLogTxt(
+    imageRes.res = CommonDef.makeLogTxt(
         i_output.replace("\\", "/").strip('"'), log_msg, log_dir, False
     )
+
+
+if(imageRes.res[0] == True):
+    print(f"SUCCESS|{imageRes.sizeX}|{imageRes.sizeY}|{int(imageRes.iDpi)}|{int(imageRes.fileSize)}")
+else:
+    print(f"FAILED|{imageRes.res[1]}")
