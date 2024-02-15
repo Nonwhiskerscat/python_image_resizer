@@ -8,7 +8,7 @@ imageRes = ProgramRes()
 
 # 자동화
 possible_img_idx = []
-possible_img_watermark = []
+possible_ani_watermark = []
 
 # ConfigParser 객체C:\Users\김서용\Desktop\gif_water 4 생성
 config = configparser.ConfigParser()
@@ -19,10 +19,11 @@ w_idx = str(sys.argv[-1])
 # image 워터마크 파일 생성
 
 config.read(FileRoot.in_root, encoding="UTF-8")
-for key in config["Image_TypeI"].keys():
-    possible_img_watermark.append(key)
+for key in config["Ani_Image"].keys():
+    possible_ani_watermark.append(key)
 for key in config["Water_Idx"].keys():
     possible_img_idx.append(key)
+
 # 사용 예시
 # watermarkForImg("input.jpg", "output.jpg", "watermark.png", 196)
 
@@ -38,7 +39,6 @@ w_ent_path = os.path.join(FileRoot.water_root, w_path)
 log_dir = FileRoot.log_root
 CommonDef.createDir(log_dir)
 
-
 # 워터 마크 너비
 def wWidth(width):
     return math.ceil(width * float(config["Water_Ratio"][w_idx]))
@@ -50,7 +50,7 @@ def wHeight(wmark, wwidth):
     return math.ceil(wwidth / w_ratio)
 
 
-def watermarkForImg(i_input, w_image, w_opacity):
+def watermarkForGif(i_input, w_image, w_opacity):
     global log_msg
     global i_output
 
@@ -59,65 +59,66 @@ def watermarkForImg(i_input, w_image, w_opacity):
         imageRes.sizeY = im.height
         idpi = CommonDef.getDPI(im)
         imageRes.iDpi = idpi
+        original_gif = Image.open(i_input)
 
-    new_path = f"{CommonDef.getFileName(i_input)}w{w_idx}{CommonDef.getFileExt(i_input)}"
+
+    new_path = f"{CommonDef.getFileName(i_input)}wa{w_idx}{CommonDef.getFileExt(i_input)}"
     i_output = os.path.join(CommonDef.getFileRoot(i_input), new_path)
-
 
     if not os.path.isfile(i_input):
         log_msg = "유효하지 않은 패스"
         return False
 
-    if CommonDef.getFileExt(i_input).lower() not in possible_img_watermark:
+    if CommonDef.getFileExt(i_input).lower() not in possible_ani_watermark:
         log_msg = "지원하지 않는 파일 확장자(" + CommonDef.getFileExt(i_input) + ")"
         return False
 
-    original_image = Image.open(i_input).convert("RGBA")
-    watermark = Image.open(w_image).convert("RGBA")
 
-    # 워터마크 크기 조정
-    w_resized = watermark.resize(
-        (wWidth(original_image.width), wHeight(watermark, wWidth(original_image.width)))
-    )
+    frames = []
+    for frame in ImageSequence.Iterator(original_gif):
+        frame = frame.convert("RGBA")
+        watermark = Image.open(w_image).convert("RGBA")
 
-    # 알파 채널 생성
-    alpha = w_resized.getchannel("A")
-    alpha = alpha.point(lambda p: int(p * w_opacity))
-    w_resized.putalpha(alpha)
+        w_resized = watermark.resize(
+            (wWidth(frame.width), wHeight(watermark, wWidth(frame.width))),
+            resample=Image.NEAREST  # 보간 알고리즘 설정
+        )
 
-    position_x = original_image.width - math.ceil(1.1 * w_resized.width)
-    position_y = (
-        original_image.height - w_resized.height - math.ceil(0.1 * w_resized.width)
-    )
+        alpha = w_resized.getchannel("A")
+        alpha = alpha.point(lambda p: int(p * w_opacity))
+        w_resized.putalpha(alpha)
 
-    transparent = Image.new(
-        "RGBA", (original_image.width, original_image.height), (0, 0, 0, 0)
-    )
+        position_x = frame.width - math.ceil(1.1 * w_resized.width)
+        position_y = (
+            frame.height - w_resized.height - math.ceil(0.1 * w_resized.width)
+        )
 
-    # 가상 이미지에 원본 사진 레이어 추가
-    transparent.paste(original_image, (0, 0))
+        transparent = Image.new(
+            "RGBA", (frame.width, frame.height), (0, 0, 0, 0)
+        )
 
-    # 가상 이미지에 워터 마크 레이어 추가
-    transparent.paste(w_resized, (position_x, position_y), w_resized)
+        transparent.paste(frame, (0, 0))
+        transparent.paste(w_resized, (position_x, position_y), w_resized)
 
-    # 가상 이미지 저장
+        frames.append(transparent)
+
+    # 새로운 GIF 이미지 생성
     try:
-        transparent.save(fp=i_output)
-        log_msg = "워터마크 이미지 제작 완료"
+        frames[0].save(fp=i_output, save_all=True, append_images=frames[1:], loop=0, optimize=True, duration=original_gif.info['duration'], disposal=2, colors=256)
+        log_msg = "워터마크 GIF 이미지 제작 완료"
         file_size = os.path.getsize(i_output)
         imageRes.fileSize = file_size
         return True
     except Exception as error_msg:
-        log_msg = "에러 발생" + str(error_msg)
+        log_msg = "에러 발생: " + str(error_msg)
         return False
 
 w_opacity = float(config["Water_Opacity"][w_idx])
 
-if watermarkForImg(i_path, w_ent_path, w_opacity) == True:
+if watermarkForGif(i_path, w_ent_path, w_opacity) == True:
     imageRes.res = CommonDef.makeLogTxt(i_output, log_msg, log_dir, True)
 else:
     imageRes.res = CommonDef.makeLogTxt(i_output, log_msg, log_dir, False)
-
 
 if(imageRes.res[0] == True):
     print(f"SUCCESS|{imageRes.sizeX}|{imageRes.sizeY}|{int(imageRes.iDpi)}|{int(imageRes.fileSize)}")
