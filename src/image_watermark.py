@@ -14,7 +14,9 @@ possible_img_watermark = []
 config = configparser.ConfigParser()
 i_path = FileRoot.RootDir(sys.argv[1])
 i_root = os.path.dirname(i_path)
-w_idx = str(sys.argv[-1])
+
+w_idx = str(sys.argv[-2])
+suffix = str(sys.argv[-1])
 
 # image 워터마크 파일 생성
 
@@ -54,13 +56,7 @@ def watermarkForImg(i_input, w_image, w_opacity):
     global log_msg
     global i_output
 
-    with Image.open(i_input) as im:
-        imageRes.sizeX = im.width
-        imageRes.sizeY = im.height
-        idpi = CommonDef.getDPI(im)
-        imageRes.iDpi = idpi
-
-    new_path = f"{CommonDef.getFileName(i_input)}w{w_idx}{CommonDef.getFileExt(i_input)}"
+    new_path = f"{suffix}{CommonDef.getFileExt(i_input)}"
     i_output = os.path.join(CommonDef.getFileRoot(i_input), new_path)
 
 
@@ -72,7 +68,7 @@ def watermarkForImg(i_input, w_image, w_opacity):
         log_msg = "지원하지 않는 파일 확장자(" + CommonDef.getFileExt(i_input) + ")"
         return False
 
-    original_image = Image.open(i_input).convert("RGBA")
+    original_image = Image.open(i_input).convert("RGB")
     watermark = Image.open(w_image).convert("RGBA")
 
     # 워터마크 크기 조정
@@ -102,9 +98,22 @@ def watermarkForImg(i_input, w_image, w_opacity):
 
     # 가상 이미지 저장
     try:
-        transparent.save(fp=i_output)
+        try:
+            transparent.save(fp=i_output)
+
+        except:
+            transparent = transparent.convert("RGB")
+            transparent.save(fp=i_output)
+
         log_msg = "워터마크 이미지 제작 완료"
         file_size = os.path.getsize(i_output)
+
+        with Image.open(i_output) as im:
+            idpi = CommonDef.getDPI(im)
+            imageRes.iDpi = idpi
+            imageRes.sizeX = im.width
+            imageRes.sizeY = im.height
+
         imageRes.fileSize = file_size
         return True
     except Exception as error_msg:

@@ -8,10 +8,11 @@ from PIL import Image
 imageRes = ProgramRes()
 
 i_path = sys.argv[1].replace("\\", "/").strip('"')  # img path
-x_start = sys.argv[-4]  # X 시작 좌표
-y_start = sys.argv[-3]  # Y 시작 좌표
-x_end = sys.argv[-2]  # X 끝 좌표
-y_end = sys.argv[-1]  # Y 끝 좌표
+x_start = sys.argv[-5]  # X 시작 좌표
+y_start = sys.argv[-4]  # Y 시작 좌표
+x_end = sys.argv[-3]  # X 끝 좌표
+y_end = sys.argv[-2]  # Y 끝 좌표
+suffix = sys.argv[-1] # 파일 이름
 
 
 # ConfigParser 객체 생성
@@ -30,7 +31,7 @@ CommonDef.createDir(log_dir)
 
 def cropImg(i_input, x1, y1, x2, y2):
     global log_msg, crop_output
-    crop_path = f"{CommonDef.getFileName(i_input)}c.{x1}.{y1}.{x2}.{y2}{CommonDef.getFileExt(i_input)}"
+    crop_path = f"{suffix}{CommonDef.getFileExt(i_input)}"
     crop_output = os.path.join(CommonDef.getFileRoot(i_input), crop_path)
 
     # 해당 패스가 유효하지 않을 때
@@ -74,16 +75,19 @@ def cropImg(i_input, x1, y1, x2, y2):
     # 이미지 Croping
     try:
         with Img(fp=i_input) as im:
-            idpi = CommonDef.getDPI(im)
-            imageRes.iDpi = idpi
-
             im.crop(box=(x1, y1, x2, y2))
             im.save(fp=crop_output)
 
-            cropped_file_size = os.path.getsize(crop_output)
-            imageRes.fileSize = cropped_file_size
+        with Img(fp=crop_output) as im:
+            imageRes.sizeX = im.width
+            imageRes.sizeY = im.height
+            idpi = CommonDef.getDPI(im)
+            imageRes.iDpi = idpi
 
-            log_msg = f"Cropping 완료({x1},{y1}_{x2},{y2})"
+        cropped_file_size = os.path.getsize(crop_output)
+        imageRes.fileSize = cropped_file_size
+
+        log_msg = f"Cropping 완료({x1},{y1}_{x2},{y2})"
         return True
     except Exception as error_msg:
         print(i_input)
@@ -98,6 +102,6 @@ else:
     imageRes.res = CommonDef.makeLogTxt(i_path, log_msg, log_dir, False)
 
 if(imageRes.res[0] == True):
-    print(f"SUCCESS|{int(x_end)-int(x_start)}|{int(y_end)-int(y_start)}|{int(imageRes.iDpi)}|{int(imageRes.fileSize)}")
+    print(f"SUCCESS|{imageRes.sizeX}|{imageRes.sizeY}|{int(imageRes.iDpi)}|{int(imageRes.fileSize)}")
 else:
     print(f"FAILED|{imageRes.res[1]}")

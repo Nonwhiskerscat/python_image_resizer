@@ -4,8 +4,10 @@ from common import *
 
 
 def DelCommon(cat):
+    global logmsg
     # 0 sys.argv의 길이가 1일 때(아무 것도 입력되지 않았을 때)
     if len(cat) == 0:
+        logmsg = "삭제 대상이 없습니다."
         return False
 
     # 1 sys.argv의 길이가 2일 때
@@ -17,6 +19,7 @@ def DelCommon(cat):
             return True
         except Exception as e:
             # print("1 삭제 실패 " + str(e))
+            logmsg = str(e)
             return False
 
     else:
@@ -31,6 +34,7 @@ def DelCommon(cat):
                         return True
                     except Exception as e:
                         # print("2.1 삭제 실패 " + str(e))
+                        logmsg = str(e)
                         return False
 
                 ## 2.2 단일 폴더 내 파일 전부 삭제 시(폴더 명 + 키워드)
@@ -42,6 +46,7 @@ def DelCommon(cat):
                         return True
                     except Exception as e:
                         # print("2.2 삭제 실패 " + str(e))
+                        logmsg = str(e)
                         return False
 
                 ## 2.3 키워드 기준으로 파일 삭제 시(폴더 명 + 확장자 + 키워드)
@@ -52,20 +57,31 @@ def DelCommon(cat):
                         return True
                     except Exception as e:
                         # print("2.3 삭제 실패 " + str(e))
+                        logmsg = str(e)
                         return False
 
         # 3 sys.argv의 길이가 3 이상일 때
         # 위 조건에서 Return 값을 반환하지 못한 요소에 대해서는 다음 조건 충족
         if len(cat) > 2:
             del cat[0]
-            for val in cat:
-                try:
-                    DeleteCommon.One(val)
-                    # print("3 삭제 성공")
-                except Exception as e:
-                    # print("3 삭제 실패 " + str(e))
-                    t = 1
-            return True
+            try:
+
+                for val in cat:
+                    try:
+                        DeleteCommon.One(val)
+                        # print("3 삭제 성공")
+                    except Exception as e:
+                        # print("3 삭제 실패 " + str(e))
+                        t = 1
+                return True
+            
+            except Exception as e:
+                logmsg = str(e)
+                return False
 
 
-DelCommon(sys.argv)
+result = DelCommon(sys.argv)
+if(result):
+    print("SUCCESS")
+else:
+    print(f"FAILED|{logmsg}")

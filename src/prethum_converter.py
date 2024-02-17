@@ -7,15 +7,9 @@ from common import *
 
 imageRes = ProgramRes()
 
-# sys.argv[0] = file_name
-# sys.argv[1~-1] = image_files
-
 # 입력된 img 경로를 저장한 배열
-i_arr = sys.argv[1:-3]
-
-isizex = sys.argv[-3]
-isizey = sys.argv[-2]
-suffix = sys.argv[-1]
+i_arr = sys.argv
+del i_arr[0]
 
 # ConfigParser 객체 생성
 config = configparser.ConfigParser()
@@ -92,76 +86,109 @@ def isPath(i_input):
         return True
 
 
-def freeResizer(i_input, width, height):
-    log_msg_f = ""  # log_msg_f 초기화
-    i_img = Image.open(i_input)
-    if height == 0:
-        height = (width / i_img.width) * i_img.height
+def resize_image(image, output_path, custom_width, size_function):
+    new_size = size_function(image)
 
-    if width == 0:
-        width = (height / i_img.height) * i_img.width
+    if image.width < custom_width:
+        return image
+    
+    return resizeImg(image, new_size)
 
-    free_path = f"{suffix}{CommonDef.getFileExt(i_input)}"
-    free_output = os.path.join(CommonDef.getFileRoot(i_input), free_path)
+
+
+def save_image(image, output_path):
+    image.save(fp=output_path)
+
+
+def process_image(i_input, custom_width, size_function, type):
+    global log_msg_t, log_msg_p
+
+    path_suffix = ""
+
+    if type == "thm":
+        path_suffix = "t"
+    elif type == "pre":
+        path_suffix = "p"
+
+    output_path = os.path.join(
+        CommonDef.getFileRoot(i_input),
+        CommonDef.getFileName(i_input) + path_suffix + CommonDef.getFileExt(i_input),
+    )
 
     try:
-        if CommonDef.getFileExt(i_input).lower() != ".gif":
-            with Image.open(i_input) as im:
-                resized_img = resizeImg(im, (int(width), int(height)))
-                resized_img.save(fp=free_output)
-
-        else:
-            resizeGif(i_input, free_output, (int(width), int(height)))
-
-        file_size = os.path.getsize(free_output)
-        imageRes.fileSize = file_size
-        with Image.open(free_output) as im:
-            idpi = CommonDef.getDPI(im)
-            imageRes.iDpi = idpi
+        ext = CommonDef.getFileExt(i_input).lower()
+        with Image.open(i_input) as im:
             imageRes.sizeX = im.width
             imageRes.sizeY = im.height
-        
-        log_msg_f = f"이미지 리사이징 완료({width}, {int(height)})"
+            idpi = CommonDef.getDPI(im)
+            imageRes.iDpi = idpi
+            if ext == ".gif":
+                frames = [
+                    resize_image(frame, output_path, custom_width, size_function)
+                    for frame in ImageSequence.Iterator(im)
+                ]
+                new_im = frames[0].copy()
+                new_im.save(output_path, save_all=True, append_images=frames[1:])
+            else:
+                resized_img = resize_image(im, output_path, custom_width, size_function)
+                save_image(resized_img, output_path)
 
+        if type == "thm":
+            log_msg_t = "썸네일 변환 완료"
+        elif type == "pre" :
+            log_msg_p = "프리뷰 변환 완료"
+        else:
+            return False
     except Exception as error_msg:
-        log_msg_f = f"이미지 리사이징 실패 {str(error_msg)}"
+        if type == "thm":
+            log_msg_t = "썸네일 변환 실패 " + str(error_msg)
+        elif type == "pre" :
+            log_msg_p = "프리뷰 변환 실패 " + str(error_msg)
         return False
 
     return True
 
-def imgResizerCommon(i_input):
-    log_msg_f = ""  # log_msg_f 초기화
-    if isPath(i_input) == True:
-        try:
-            if freeResizer(i_input, int(isizex), int(isizey)):
-                imageRes.res = CommonDef.makeLogTxt(i_input, log_msg_f, log_dir, True)
-            else:
-                imageRes.res = CommonDef.makeLogTxt(i_input, log_msg_f, log_dir, False)
 
-        except Exception as e:
-            log_msg_f = str(e)
-            imageRes.res = CommonDef.makeLogTxt(i_input, log_msg_f, log_dir, False)
+def thumbnailResizer(i_input):
+    return process_image(
+        i_input, imageCustom.thumbnail_width, imageCustom._thumbnail_size, "thm"
+    )
+
+def previewResizer(i_input):
+    return process_image(
+        i_input, imageCustom.preview_width, imageCustom._preview_size, "pre"
+    )
+
+
+# 반복 최소화
+def changeCommon(cat):
+    if thumbnailResizer(cat):
+        imageRes.res = CommonDef.makeLogTxt(cat, log_msg_t, log_dir, True)
+        
+    else:
+        imageRes.res = CommonDef.makeLogTxt(cat, log_msg_t, log_dir, False)
+
+    if previewResizer(cat):
+        imageRes.res = CommonDef.makeLogTxt(cat, log_msg_p, log_dir, True)
+    else:
+        imageRes.res = CommonDef.makeLogTxt(cat, log_msg_p, log_dir, False)
+
+
+def imgResizerCommon(i_input):
+    if isPath(i_input) == True:
+        changeCommon(i_input)
 
     else:
         imageRes.res = CommonDef.makeLogTxt(i_input, log_msg_i, log_dir, False)
 
 
-
 try:
     for img in i_arr:
-        try:
-            imgResizerCommon(img.replace("\\", "/").strip('"'))
-        except:
-            imgResizerCommon(i_arr[0].replace("\\", "/").strip('"'))
-    
-except Exception as e:
-        print(str)
-        imageRes.res = CommonDef.makeLogTxt("", str(e), log_dir, False)
-
+        imgResizerCommon(img.replace("\\", "/").strip('"'))
+except:
+    imgResizerCommon(i_arr[0].replace("\\", "/").strip('"'))
 
 if(imageRes.res[0] == True):
-    print(f"SUCCESS|{imageRes.sizeX}|{imageRes.sizeY}|{int(imageRes.iDpi)}|{int(imageRes.fileSize)}")
+    print(f"SUCCESS|{imageRes.sizeX}|{imageRes.sizeY}|{int(imageRes.iDpi)}")
 else:
     print(f"FAILED|{imageRes.res[1]}")
-
-# os.system("pause")

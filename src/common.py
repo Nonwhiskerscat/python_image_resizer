@@ -105,6 +105,12 @@ class CommonDef:
             pass
 
         return default_dpi # 이미지의 DPI 정보가 메타데이터에 포함되어 있지 않는 경우 72를 리턴한다.(디폴트 값이 72이기 때문)
+    
+    # 새로운 DPI 정보 수정
+    # def modifyDpi(image_path, new_dpi):
+    #     with Image.open(image_path) as img:
+    #         img.info['dpi'] = new_dpi
+    #         img.save(image_path)
 
     
     # isdit 커스텀 메서드

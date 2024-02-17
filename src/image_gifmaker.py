@@ -22,19 +22,13 @@ for key in config["Image_TypeI"].keys():
 log_dir = FileRoot.log_root
 CommonDef.createDir(log_dir)
 
+img_dura = sys.argv[-2]
+suffix = sys.argv[-1]
 
-# 이미지 Duration
-img_dura = sys.argv[-1]
-
-# 이미지 Duration Default 값
-if not CommonDef.isDigit(img_dura):
-    img_dura = 500
-else:
-    img_dura = int(img_dura)
+img_dura = int(img_dura)
 
 # 이미지 패스 배열
-imgs_arr = sys.argv
-del imgs_arr[0], imgs_arr[-1]
+imgs_arr = sys.argv[1:-2]
 
 # 이미지 프레임
 from PIL import Image, ImageOps
@@ -52,7 +46,7 @@ def center_image_in_frame(image, frame_width, frame_height):
 
 def gifMaker(i_inputs):
     global log_msg, i_output
-    new_path = CommonDef.getFileName(i_inputs[0]) + "gm.gif"
+    new_path = suffix + ".gif"
     i_output = os.path.join(CommonDef.getFileRoot(i_inputs[0]), new_path)
 
     for idx, val in enumerate(i_inputs):
@@ -94,11 +88,12 @@ def gifMaker(i_inputs):
         file_size = os.path.getsize(i_output)
         imageRes.fileSize = file_size
 
-        with Image.open(i_output):
+        with Image.open(i_output) as im:
             imageRes.sizeX = im.width
             imageRes.sizeY = im.height
             idpi = CommonDef.getDPI(im)
             imageRes.iDpi = idpi
+
         log_msg = "GIF 이미지 생성 완료"
 
     except Exception as error_msg:

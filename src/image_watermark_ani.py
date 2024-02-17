@@ -14,7 +14,9 @@ possible_ani_watermark = []
 config = configparser.ConfigParser()
 i_path = FileRoot.RootDir(sys.argv[1])
 i_root = os.path.dirname(i_path)
-w_idx = str(sys.argv[-1])
+
+w_idx = str(sys.argv[-2])
+suffix = str(sys.argv[-1])
 
 # image 워터마크 파일 생성
 
@@ -54,13 +56,10 @@ def watermarkForGif(i_input, w_image, w_opacity):
     global log_msg
     global i_output
 
-    with Image.open(i_input) as im:
-        imageRes.sizeX = im.width
-        imageRes.sizeY = im.height
-        original_gif = Image.open(i_input)
+    original_gif = Image.open(i_input)
 
 
-    new_path = f"{CommonDef.getFileName(i_input)}wa{w_idx}{CommonDef.getFileExt(i_input)}"
+    new_path = f"{suffix}{CommonDef.getFileExt(i_input)}"
     i_output = os.path.join(CommonDef.getFileRoot(i_input), new_path)
 
     if not os.path.isfile(i_input):
@@ -107,6 +106,8 @@ def watermarkForGif(i_input, w_image, w_opacity):
         file_size = os.path.getsize(i_output)
         imageRes.fileSize = file_size
         with Image.open(i_output) as im:
+            imageRes.sizeX = im.width
+            imageRes.sizeY = im.height
             idpi = CommonDef.getDPI(im)
             imageRes.iDpi = idpi
         return True

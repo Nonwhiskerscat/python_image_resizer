@@ -14,7 +14,10 @@ from common import *
 i_input = sys.argv[1].replace("\\", "/").strip('"')
 
 # 입력된 프레임 수
-c_frames = sys.argv[-1]
+c_frames = sys.argv[-2]
+
+# 파일 이름
+suffix = sys.argv[-1]
 
 # 원본 이미지의 전체 프레임 수
 i_frames = CommonDef.aniFrames(i_input)
@@ -24,9 +27,9 @@ i_frames = CommonDef.aniFrames(i_input)
 if c_frames == "*":
     c_frames = i_frames
 
-## 입력받은 값이 자연수가 아닌 경우 0을 부여받는다.
+## 입력받은 값이 자연수가 아닌 경우 i_frames을 부여받는다.
 elif not c_frames.isdigit():
-    c_frames = 0
+    c_frames = i_frames
 
 # 파일 위치
 i_root = os.path.dirname(i_input)
@@ -98,9 +101,9 @@ def aniDecompose(img, frmarr, cfrm):
 
     try:
         # 이미지와 같은 경로에 이미지 이름으로 된 폴더 생성
-        CommonDef.createDir(FileRoot.SubDir(i_root, CommonDef.getFileName(i_input)))
+        CommonDef.createDir(FileRoot.SubDir(i_root, suffix))
         # 이미지 폴더 내 모든 파일 삭제(동일한 이미지에 해당 프로그램을 재구동 할 시, 이미지 오버랩 현상 발생을 해결)
-        DeleteCommon.All(f"{i_root}/{CommonDef.getFileName(i_input)}")
+        DeleteCommon.All(f"{i_root}/{suffix}")
 
         # 파일 이름 구분자인 frm_order 선언
         frm_order = 0
@@ -111,7 +114,7 @@ def aniDecompose(img, frmarr, cfrm):
                 # idx 값이 프레임 배열의 값에 포함될 경우
                 if idx in frmarr:
                     # 해당 프레임 이미지 저장(파일 형식_png)
-                    i_output = f"{i_root}/{CommonDef.getFileName(i_input)}/frames_{frm_order}.png"
+                    i_output = f"{i_root}/{suffix}/{frm_order}.png"
                     frame.save(i_output, format="PNG")
 
                     if(frm_order==0):
@@ -147,6 +150,6 @@ else:
     imageRes.res = CommonDef.makeLogTxt(i_input.replace("\\", "/").strip('"'), log_msg, log_dir, False)
 
 if(imageRes.res[0] == True):
-    print(f"SUCCESS|{imageRes.sizeX}|{imageRes.sizeY}|{int(imageRes.iDpi)}|{int(imageRes.fileSize)}")
+    print(f"SUCCESS")
 else:
     print(f"FAILED|{imageRes.res[1]}")

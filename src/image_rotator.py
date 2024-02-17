@@ -11,7 +11,8 @@ imageRes = ProgramRes()
 i_input = sys.argv[1].replace("\\", "/").strip('"')
 
 # 이미지 회전 각도
-i_rotate = sys.argv[-1]  # 이미지 회전 각도
+i_rotate = sys.argv[-2]  # 이미지 회전 각도
+suffix = sys.argv[-1]
 
 # ini 파일 읽어오기
 config = configparser.ConfigParser()
@@ -37,8 +38,6 @@ def rotateImg(img, angle):
 def rotateGif(input, output, angle):
     with Image.open(input) as im:
         frames = []
-        idpi = CommonDef.getDPI(im)
-        imageRes.iDpi = idpi
 
         # 프레임 추출 및 각 프레임 회전
         for frame in range(im.n_frames):
@@ -57,7 +56,7 @@ def rotateCommon(img, rot):
     global log_msg, i_output
 
     # 결과 이미지 패스 > 원본과 같은 폴더에서 파일 이름_rot로테이트 앵글
-    new_path = f"{CommonDef.getFileName(img)}r{rot}{CommonDef.getFileExt(img)}"
+    new_path = f"{suffix}{CommonDef.getFileExt(img)}"
     i_output = os.path.join(CommonDef.getFileRoot(img), new_path)
 
     # 입력된 패스가 유효하지 않을 때
@@ -79,21 +78,20 @@ def rotateCommon(img, rot):
         # 이미지 형식이 Gif가 아닐 때
         if CommonDef.getFileExt(img).lower() != ".gif":
             with Image.open(img) as im:
-                imageRes.sizeX = im.width
-                imageRes.sizeY = im.height
-                idpi = CommonDef.getDPI(im)
-                imageRes.iDpi = idpi
                 rotated_image = rotateImg(im, rot)
                 rotated_image.save(fp=i_output)
-                file_size = os.path.getsize(i_output)
-                imageRes.fileSize = file_size
-
-                with Image.open(i_output):
-                    imageRes.sizeX = im.width
-                    imageRes.sizeY = im.height
         # 이미지 형식이 Gif일 때
         else:
             rotateGif(img, i_output, rot)
+
+        with Image.open(i_output) as im:
+            imageRes.sizeX = im.width
+            imageRes.sizeY = im.height
+            idpi = CommonDef.getDPI(im)
+            imageRes.iDpi = idpi
+
+        file_size = os.path.getsize(i_output)
+        imageRes.fileSize = file_size
 
         log_msg = "이미지 로테이트 완료"
 
