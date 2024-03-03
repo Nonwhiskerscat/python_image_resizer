@@ -8,6 +8,7 @@ import configparser
 from PIL import Image, ExifTags
 
 config = configparser.ConfigParser()
+Image.MAX_IMAGE_PIXELS = None 
 
 class ProgramRes:
     pass
