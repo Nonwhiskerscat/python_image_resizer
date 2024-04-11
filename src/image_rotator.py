@@ -30,7 +30,7 @@ CommonDef.createDir(log_dir)
 
 # 정적 이미지 로테이트 메서드
 def rotateImg(img, angle):
-    img_rotated = img.rotate(float(angle), expand=True)
+    img_rotated = img.rotate(-1*float(angle), expand=True)
     return img_rotated
 
 
