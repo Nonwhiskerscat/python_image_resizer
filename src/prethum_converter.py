@@ -37,15 +37,14 @@ def resizeGif(input, output, size):
     with Image.open(input) as im:
         frames = []
 
-        # 프레임 추출 및 각 프레임 회전
+        # 프레임 추출 및 각 프레임 리사이징
         for frame in range(im.n_frames):
             im.seek(frame)
             resized_frame = resizeImg(im.copy(), size)
             frames.append(resized_frame)
 
-        # 회전된 프레임을 새로운 GIF 파일로 저장
+        # 리사이징된 프레임을 새로운 GIF 파일로 저장
         frames[0].save(output, save_all=True, append_images=frames[1:], loop=0)
-
 
 # 사이즈 조절 클래스
 class imageCustom:
@@ -88,13 +87,7 @@ def isPath(i_input):
 
 def resize_image(image, output_path, custom_width, size_function):
     new_size = size_function(image)
-
-    if image.width < custom_width:
-        return image
-    
     return resizeImg(image, new_size)
-
-
 
 def save_image(image, output_path):
     image.save(fp=output_path)
@@ -122,16 +115,34 @@ def process_image(i_input, custom_width, size_function, type):
             imageRes.sizeY = im.height
             idpi = CommonDef.getDPI(im)
             imageRes.iDpi = idpi
-            if ext == ".gif":
-                frames = [
-                    resize_image(frame, output_path, custom_width, size_function)
-                    for frame in ImageSequence.Iterator(im)
-                ]
-                new_im = frames[0].copy()
-                new_im.save(output_path, save_all=True, append_images=frames[1:])
+
+            if imageRes.sizeX <= custom_width:
+
+                if ext == ".gif":
+                    # 프레임 추출 및 각 프레임 리사이징
+                    frames = []
+                    
+                    for frame in range(im.n_frames):
+                        im.seek(frame)
+                        ifrm = im.copy()
+                        frames.append(ifrm)
+
+                    frames[0].save(output_path, save_all=True, append_images=frames[1:], loop=0)
+
+                else:
+                    save_image(im, output_path)
+
             else:
-                resized_img = resize_image(im, output_path, custom_width, size_function)
-                save_image(resized_img, output_path)
+                if ext == ".gif":
+                    frames = [
+                        resize_image(frame, output_path, custom_width, size_function)
+                        for frame in ImageSequence.Iterator(im)
+                    ]
+                    new_im = frames[0].copy()
+                    new_im.save(output_path, save_all=True, append_images=frames[1:])
+                else:
+                    resized_img = resize_image(im, output_path, custom_width, size_function)
+                    save_image(resized_img, output_path)
 
         if type == "thm":
             log_msg_t = "썸네일 변환 완료"
@@ -159,12 +170,10 @@ def previewResizer(i_input):
         i_input, imageCustom.preview_width, imageCustom._preview_size, "pre"
     )
 
-
 # 반복 최소화
 def changeCommon(cat):
     if thumbnailResizer(cat):
         imageRes.res = CommonDef.makeLogTxt(cat, log_msg_t, log_dir, True)
-        
     else:
         imageRes.res = CommonDef.makeLogTxt(cat, log_msg_t, log_dir, False)
 

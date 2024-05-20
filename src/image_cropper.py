@@ -64,15 +64,21 @@ def cropImg(i_input, x1, y1, x2, y2):
     imageRes.sizeX, imageRes.sizeY = i_obj.size
 
     # 좌표 값이 0보다 작거나 이미지의 높이와 너비 값을 오버할 때, 그리고 각 좌표 간의 차이가 이미지의 너비 및 높이의 값을 오버할 때
-    if (
-        any(val < 0 or val > i_width for val in (x1, x2))
-        or any(val < 0 or val > i_height for val in (y1, y2))
-        or x2 - x1 > i_width
-        or y2 - y1 > i_height
-    ):
-        log_msg = f"Crop 파라미터 수치 오류({x1},{y1}_{x2},{y2})"
-        return False
-    # 이미지 Croping
+    def check_range(val, i_limit):
+        return max(0, min(val, i_limit))
+
+    x1 = check_range(x1, i_width)
+    x2 = check_range(x2, i_width)
+
+    y1 = check_range(y1, i_height)
+    y2 = check_range(y2, i_height)
+
+    if x2 - x1 > i_width:
+        x1, x2 = 0, i_width
+
+    if y2 - y1 > i_height:
+        y1, y2 = 0, i_height
+
     try:
         with Img(fp=i_input) as im:
             im.crop(box=(x1, y1, x2, y2))
