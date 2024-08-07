@@ -2,6 +2,11 @@
 import configparser
 from common import *
 
+#
+# 여기서부터 이미지 전용 ini 생성 
+# 
+
+
 # ConfigParser 객체 생성
 config = configparser.ConfigParser()
 
@@ -62,19 +67,45 @@ config["Water_Opacity"] = {1: 0.9, 4: 0.9, 5: 0.9}
 # 1: 동아일보, 4: 스포츠동아, 5: 동아닷컴
 
 # 로그 및 에러로그 파일 위치
-config["LogFile_Route"] = {"root": FileRoot.program_dirname + "/Log"}
 
 # config.ini 파일 생성
 with open("image_custom.ini", "wt", encoding="UTF-8") as conf_file:
     config.write(conf_file)
 
-# config.ini 파일 읽기
-config.read("image_custom.ini", encoding="UTF-8")
+#
+# 여기서부터 파일 전용 ini 생성 
+# 
 
-# Section 정보 가져오기
-sections = config.sections()
+# ConfigParser 객체 생성
+fconfig = configparser.ConfigParser()
+# 워터마크 이미지 위치
+fconfig["Forder_Path"] = {
+    "TEMP": "\\\\10.70.8.191\dr_nas\WPS_Root\TEMP",
+    "LOG": FileRoot.program_dirname + "/Log"
+}
+
+fconfig["Image_TypeI"] = {}
+Image_TypeI = fconfig["Image_TypeI"]
+
+pos_img_arr_1 = [
+    "jpg",
+    "jpeg",
+    "bmp",
+    "png",
+    "webp",
+    "gif",
+]
 
 
+
+
+
+config["LogFile_Route"] = {"root": FileRoot.program_dirname + "/Log"}
+
+# config.ini 파일 생성
+with open("file_custom.ini", "wt", encoding="UTF-8") as fconf_file:
+    fconfig.write(fconf_file)
+    
 # # 이후 딕셔너리와 동일하게 처리 가능
 # for item in config['File_info'].items():
 #     print(item)

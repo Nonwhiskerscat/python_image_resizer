@@ -24,6 +24,7 @@ class FileRoot:
     program_dirname = os.path.abspath(sys.argv[0])
     # custom.ini 파일의 경로
     in_root = os.path.join(os.path.dirname(program_dirname), "image_custom.ini")
+    fn_root = os.path.join(os.path.dirname(program_dirname), "file_custom.ini")
     log_root = os.path.join(os.path.dirname(os.path.dirname(program_dirname)), "Log")
     water_root = os.path.join(os.path.dirname(program_dirname), "Watermark")
 
@@ -68,10 +69,14 @@ class CommonDef:
         CommonDef.createDir(FileRoot.LogDir(parent, 3))
 
     # 로그 txt 생성 메서드
-    def makeLogTxt(path, msg, parent, bool):
+    def makeLogTxt(path, msg, parent, type):
         CommonDef.makeLogDir(parent)
-        if bool == True:
+        if type == True:
             tpath = FileRoot.LogDir(parent, 3) + "/" + "clear.txt"
+        elif type == 'clean':
+            tpath = FileRoot.LogDir(parent, 3) + "/" + "clean.txt"
+        elif type == 'cleanError':
+            tpath = FileRoot.LogDir(parent, 3) + "/" + "cleanError.txt"
         else:
             tpath = FileRoot.LogDir(parent, 3) + "/" + "failed.txt"
         f = open(tpath, "a")
