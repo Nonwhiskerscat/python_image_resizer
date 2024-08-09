@@ -8,6 +8,7 @@ from common import *
 root = sys.argv[1] if len(sys.argv) > 1 else '0'
 ext = sys.argv[2] if len(sys.argv) > 2 else '0'
 time = sys.argv[3] if len(sys.argv) > 3 else '0'
+filter = sys.argv[4] if len(sys.argv) > 4 else '' # 필터는 0을 입력될 수 있으니까 기본값을 공백처리
 
 now = datetime.now()
 
@@ -19,19 +20,32 @@ CommonDef.createDir(log_dir)
 config = configparser.ConfigParser()
 config.read(FileRoot.fn_root, encoding="UTF-8")
 
-# 시간 값이 0으로 들어오면 일주일 전 다음날 0시
-if time == '0':
-    one_week_ago = now - timedelta(weeks=1)
-    next_day_midnight = (one_week_ago + timedelta(days=1)).replace(hour=0, minute=0, second=0, microsecond=0)
-    time = next_day_midnight.strftime('%Y%m%d%H%M%S')
-
-if root == '0':
-    root = config["Forder_Path"]["temp"]
-
+# 이미지 확장자 정리
 image_extensions = []
 for key in config["Image_TypeI"].keys():
     image_extensions.append(key)
     image_extensions.append(key.upper())
+
+# 시간 설정
+if time == '0':
+    if "time" in config["Custom_Setting"]:
+        cDate = config["Custom_Setting"]["time"]
+        setTime = now - timedelta(days=int(cDate))
+    else:
+        setTime = now - timedelta(days=2)
+    time = setTime.strftime('%Y%m%d%H%M%S')
+
+# 최상위 디렉토리 패스 설정
+if root == '0':
+    if "root" in config["Custom_Setting"]:
+        root = config["Custom_Setting"]["root"]
+    else:
+        root = config["Forder_Path"]["temp"]
+
+# 확장자 설정
+if ext == '0':
+    if "ext" in config["Custom_Setting"]:
+        ext = config["Custom_Setting"]["ext"]
 
 if ext == '0':
     files = glob.glob(f'{root}/**/*', recursive=True)
@@ -46,35 +60,40 @@ else:
     for pattern in patterns:
         files.extend(glob.glob(pattern, recursive=True))
 
+# 필터 설정
+if filter == '':
+    if "filter" in config["Custom_Setting"]:
+        filter = config["Custom_Setting"]["filter"]
+    else:
+        filter = ''
+
 formattime = datetime.strptime(time, '%Y%m%d%H%M%S')
 formattime = formattime.strftime('%Y년 %m월 %d일 %H시 %M분 %S초'.encode('unicode-escape').decode()).encode().decode('unicode-escape')
 
-CommonDef.makeLogTxt("클린 시작 ··· ", f"조건 『파일 루트: {root}, 파일 확장자: {ext if ext != '0' else '전체'}, 삭제 조건: {formattime} 이전 파일 모두 삭제』", log_dir, 'clean')
+CommonDef.makeLogTxt("클린 시작 ··· ", f"조건 『파일 루트: {root}, 파일 확장자: {ext if ext != '0' else '전체'}, 삭제 조건: {formattime} 이전 파일 모두 삭제, 필터: {filter if filter != '' else '없음'}』", log_dir, 'clean')
 
 try:
     del_count = 0
     for file in files:
         try:
-            mtime = os.path.getmtime(file)
-            mtime = datetime.fromtimestamp(mtime)
-            mtime = mtime.strftime('%Y%m%d%H%M%S')
             if os.path.isfile(file):
-                if(int(mtime) < int(time)):
-                    os.remove(file)
-                    CommonDef.makeLogTxt(file, " 삭제 완료", log_dir, 'clean')
-                    del_count += 1
-
+                mtime = os.path.getmtime(file)
+                mtime = datetime.fromtimestamp(mtime)
+                mtime = mtime.strftime('%Y%m%d%H%M%S')
+                if int(mtime) < int(time):
+                    if filter not in os.path.basename(file) or filter == '':
+                        os.remove(file)
+                        CommonDef.makeLogTxt(file, " 삭제 완료", log_dir, 'clean')
+                        del_count += 1
+        except FileNotFoundError:
+            CommonDef.makeLogTxt(file, " 파일이 존재하지 않음", log_dir, 'cleanError')
         except OSError as e:
-            CommonDef.makeLogTxt(file, " 삭제 실패", log_dir, 'cleanError')
+            CommonDef.makeLogTxt(file, f" 삭제 실패: {str(e)}", log_dir, 'cleanError')
 
     CommonDef.makeLogTxt("클린 완료 ··· ", f"총 {del_count}개의 파일이 삭제되었습니다.", log_dir, 'clean')
 
     print(f"SUCCESS|{del_count}")
 
 except Exception as error:
-    CommonDef.makeLogTxt("클린 실패 ··· ", error, log_dir, 'cleanError')
+    CommonDef.makeLogTxt("클린 실패 ··· ", f"오류 발생: {str(error)}", log_dir, 'cleanError')
     print(f"FAILED|{error}")
-
-
-# exe 파일 배포 시
-# pyinstaller --noconsole -F  ./src/temp_clean.py 입력
