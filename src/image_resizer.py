@@ -33,7 +33,9 @@ CommonDef.createDir(log_dir)
 
 
 # 정적 이미지 리사이즈 메서드
-def resizeImg(img, size):
+def resizeImg(img, size, orgpath):
+    if img.mode == 'RGBA' and CommonDef.getFileExt(orgpath).lower() == '.jpeg':
+        img = img.convert('RGB')
     img_resized = img.resize(size)
     return img_resized
 
@@ -46,7 +48,7 @@ def resizeGif(input, output, size):
         # 프레임 추출 및 각 프레임 회전
         for frame in range(im.n_frames):
             im.seek(frame)
-            resized_frame = resizeImg(im.copy(), size)
+            resized_frame = resizeImg(im.copy(), size, input)
             frames.append(resized_frame)
 
         # 회전된 프레임을 새로운 GIF 파일로 저장
@@ -107,7 +109,7 @@ def freeResizer(i_input, width, height):
     try:
         if CommonDef.getFileExt(i_input).lower() != ".gif":
             with Image.open(i_input) as im:
-                resized_img = resizeImg(im, (int(width), int(height)))
+                resized_img = resizeImg(im, (int(width), int(height)), i_input)
                 resized_img.save(fp=free_output)
 
         else:

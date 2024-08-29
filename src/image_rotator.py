@@ -78,6 +78,8 @@ def rotateCommon(img, rot):
         # 이미지 형식이 Gif가 아닐 때
         if CommonDef.getFileExt(img).lower() != ".gif":
             with Image.open(img) as im:
+                if im.mode == 'RGBA' and CommonDef.getFileExt(img).lower() == '.jpeg':
+                    im = im.convert('RGB')
                 rotated_image = rotateImg(im, rot)
                 rotated_image.save(fp=i_output)
         # 이미지 형식이 Gif일 때

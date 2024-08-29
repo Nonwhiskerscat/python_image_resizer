@@ -25,9 +25,10 @@ for key in config["Image_TypeI"].keys():
 log_dir = FileRoot.log_root
 CommonDef.createDir(log_dir)
 
-
 # 정적 이미지 리사이즈 메서드
-def resizeImg(img, size):
+def resizeImg(img, size, orgpath):
+    if img.mode == 'RGBA' and CommonDef.getFileExt(orgpath).lower() == '.jpeg':
+        img = img.convert('RGB')
     img_resized = img.resize(size)
     return img_resized
 
@@ -40,7 +41,7 @@ def resizeGif(input, output, size):
         # 프레임 추출 및 각 프레임 리사이징
         for frame in range(im.n_frames):
             im.seek(frame)
-            resized_frame = resizeImg(im.copy(), size)
+            resized_frame = resizeImg(im.copy(), size, input)
             frames.append(resized_frame)
 
         # 리사이징된 프레임을 새로운 GIF 파일로 저장
@@ -85,9 +86,9 @@ def isPath(i_input):
         return True
 
 
-def resize_image(image, output_path, custom_width, size_function):
+def resize_image(image, size_function, i_input):
     new_size = size_function(image)
-    return resizeImg(image, new_size)
+    return resizeImg(image, new_size, i_input)
 
 def save_image(image, output_path):
     image.save(fp=output_path)
@@ -135,13 +136,13 @@ def process_image(i_input, custom_width, size_function, type):
             else:
                 if ext == ".gif":
                     frames = [
-                        resize_image(frame, output_path, custom_width, size_function)
+                        resize_image(frame, size_function, i_input)
                         for frame in ImageSequence.Iterator(im)
                     ]
                     new_im = frames[0].copy()
                     new_im.save(output_path, save_all=True, append_images=frames[1:])
                 else:
-                    resized_img = resize_image(im, output_path, custom_width, size_function)
+                    resized_img = resize_image(im, size_function, i_input)
                     save_image(resized_img, output_path)
 
         if type == "thm":

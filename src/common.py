@@ -83,7 +83,7 @@ class CommonDef:
         f.write(str(DateTime.now) + " > " + path + " " + msg + "\n")
         f.close()
 
-        return bool, msg
+        return type, msg
 
     # 파일 주소 추출
     def getFileRoot(i_path):

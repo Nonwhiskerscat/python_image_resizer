@@ -91,6 +91,8 @@ def flipCommon(img, f_idx):
         # 이미지 형식이 Gif가 아닐 때
         if CommonDef.getFileExt(img).lower() != ".gif":
             with Image.open(img) as im:
+                if im.mode == 'RGBA' and CommonDef.getFileExt(img).lower() == '.jpeg':
+                    im = im.convert('RGB')
                 flipped_img = flipImg(im, f_idx)
                 flipped_img.save(fp=i_output)
 
@@ -125,8 +127,7 @@ else:
         i_output.replace("\\", "/").strip('"'), log_msg, log_dir, False
     )
 
-
-if(imageRes.res[0] == True):
+if(flipCommon(i_input, flip_idx) == True):
     print(f"SUCCESS|{imageRes.sizeX}|{imageRes.sizeY}|{int(imageRes.iDpi)}|{int(imageRes.fileSize)}")
 else:
     print(f"FAILED|{imageRes.res[1]}")
