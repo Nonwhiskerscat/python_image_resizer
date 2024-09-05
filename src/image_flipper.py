@@ -16,12 +16,10 @@ suffix = sys.argv[-1]
 
 # ini 파일 읽어오기
 config = configparser.ConfigParser()
-
-possible_img_flip = []
-
 config.read(FileRoot.in_root, encoding="UTF-8")
-for key in config["Image_TypeI"].keys():
-    possible_img_flip.append(key)
+
+possible_img_flip = list(config["Image_TypeI"].values())
+rgba_convert_ext = list(config["RGBA_Exception"].values())
 
 # 로그 파일 생성 및 여부
 log_dir = FileRoot.log_root
@@ -91,7 +89,7 @@ def flipCommon(img, f_idx):
         # 이미지 형식이 Gif가 아닐 때
         if CommonDef.getFileExt(img).lower() != ".gif":
             with Image.open(img) as im:
-                if im.mode == 'RGBA' and CommonDef.getFileExt(img).lower() == '.jpeg':
+                if im.mode == 'RGBA' and CommonDef.getFileExt(img).lower() in (item for item in rgba_convert_ext):
                     im = im.convert('RGB')
                 flipped_img = flipImg(im, f_idx)
                 flipped_img.save(fp=i_output)

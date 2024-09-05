@@ -24,8 +24,8 @@ config = configparser.ConfigParser()
 possible_img_resize = []
 
 config.read(FileRoot.in_root, encoding="UTF-8")
-for key in config["Image_TypeI"].keys():
-    possible_img_resize.append(key)
+possible_img_resize = list(config["Image_TypeI"].values())
+rgba_convert_ext = list(config["RGBA_Exception"].values())
 
 # 로그 파일 생성
 log_dir = FileRoot.log_root
@@ -34,7 +34,7 @@ CommonDef.createDir(log_dir)
 
 # 정적 이미지 리사이즈 메서드
 def resizeImg(img, size, orgpath):
-    if img.mode == 'RGBA' and CommonDef.getFileExt(orgpath).lower() == '.jpeg':
+    if img.mode == 'RGBA' and CommonDef.getFileExt(orgpath).lower() in (item for item in rgba_convert_ext):
         img = img.convert('RGB')
     img_resized = img.resize(size)
     return img_resized

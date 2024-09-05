@@ -21,8 +21,7 @@ config = configparser.ConfigParser()
 possible_img_crop = []
 
 config.read(FileRoot.in_root, encoding="UTF-8")
-for key in config["Image_TypeI"].keys():
-    possible_img_crop.append(key)
+possible_img_crop = list(config["Image_TypeI"].values())
 
 # 로그 파일 생성
 log_dir = FileRoot.log_root

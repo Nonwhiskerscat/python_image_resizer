@@ -12,11 +12,10 @@ imageRes = ProgramRes()
 # ConfigParser 객체 생성
 config = configparser.ConfigParser()
 
-possible_img_gifmaker = []
-
 config.read(FileRoot.in_root, encoding="UTF-8")
-for key in config["Image_TypeI"].keys():
-    possible_img_gifmaker.append(key)
+
+possible_img_gifmaker = list(config["Image_TypeI"].values())
+rgba_convert_ext = list(config["RGBA_Exception"].values())
 
 # 로그 파일 생성
 log_dir = FileRoot.log_root

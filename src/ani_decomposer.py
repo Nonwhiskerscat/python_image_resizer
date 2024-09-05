@@ -44,8 +44,7 @@ possible_gif_decom = []
 config.read(FileRoot.in_root, encoding="UTF-8")
 
 # possible_gif_decom에 확장자 append
-for key in config["Ani_Image"].keys():
-    possible_gif_decom.append(key)
+possible_gif_decom = list(config["Ani_Image"].values())
 
 # 로그 파일 주소 가져오기
 log_dir = FileRoot.log_root

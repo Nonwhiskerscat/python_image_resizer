@@ -22,9 +22,8 @@ config.read(FileRoot.fn_root, encoding="UTF-8")
 
 # 이미지 확장자 정리
 image_extensions = []
-for key in config["Image_TypeI"].keys():
-    image_extensions.append(key)
-    image_extensions.append(key.upper())
+image_extensions = [value for value in config["Image_TypeI"].values()]
+image_extensions.extend(value.upper() for value in image_extensions)
 
 # 시간 설정
 if time == '0':

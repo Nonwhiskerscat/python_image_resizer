@@ -21,10 +21,8 @@ suffix = str(sys.argv[-1])
 # image 워터마크 파일 생성
 
 config.read(FileRoot.in_root, encoding="UTF-8")
-for key in config["Ani_Image"].keys():
-    possible_ani_watermark.append(key)
-for key in config["Water_Idx"].keys():
-    possible_img_idx.append(key)
+possible_ani_watermark = list(config["Ani_Image"].values())
+possible_img_idx = list(config["Water_Idx"].values())
 
 # 사용 예시
 # watermarkForImg("input.jpg", "output.jpg", "watermark.png", 196)
@@ -33,7 +31,7 @@ for key in config["Water_Idx"].keys():
 if w_idx not in possible_img_idx:
     w_idx = "1"
 
-w_path = config["Water_Img"][w_idx]
+w_path = config["Water_Image"][w_idx]
 
 w_ent_path = os.path.join(FileRoot.water_root, w_path)
 
