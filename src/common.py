@@ -32,6 +32,7 @@ class FileRoot:
 
     # 로그 폴더 경로
     def LogDir(parent, idx):
+        parent = parent.replace("\\", "/").strip('"')
         logY_dir = parent + "/" + str(DateTime.now.year)  # Year 폴더 위치(yyyy)
         logM_dir = logY_dir + "/" + str(DateTime.now.month).zfill(2)  # Month 폴더 위치(mm)
         logD_dir = logM_dir + "/" + str(DateTime.now.day).zfill(2)  # Day 폴더 위치(mmdd)

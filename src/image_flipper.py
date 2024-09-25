@@ -75,6 +75,7 @@ def flipCommon(img, f_idx):
     new_path = f"{suffix}{CommonDef.getFileExt(img)}"
     i_output = os.path.join(CommonDef.getFileRoot(img), new_path)
 
+
     # 입력된 패스가 유효하지 않을 때
     if not os.path.isfile(img):
         log_msg = "유효하지 않은 패스"
@@ -125,7 +126,7 @@ else:
         i_output.replace("\\", "/").strip('"'), log_msg, log_dir, False
     )
 
-if(flipCommon(i_input, flip_idx) == True):
+if(imageRes.res[0] == True):
     print(f"SUCCESS|{imageRes.sizeX}|{imageRes.sizeY}|{int(imageRes.iDpi)}|{int(imageRes.fileSize)}")
 else:
     print(f"FAILED|{imageRes.res[1]}")
