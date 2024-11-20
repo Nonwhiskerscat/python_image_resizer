@@ -6,6 +6,7 @@ from PIL import Image, ImageSequence
 from common import *
 
 imageRes = ProgramRes()
+Image.MAX_IMAGE_PIXELS = None 
 
 # 이미지 파일
 i_input = sys.argv[1].replace("\\", "/").strip('"')

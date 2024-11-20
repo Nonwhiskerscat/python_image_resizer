@@ -5,7 +5,7 @@ import configparser
 import sys
 
 imageRes = ProgramRes()
-
+Image.MAX_IMAGE_PIXELS = None 
 # 자동화
 possible_img_idx = []
 possible_img_watermark = []

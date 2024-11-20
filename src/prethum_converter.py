@@ -6,7 +6,7 @@ import sys
 from common import *
 
 imageRes = ProgramRes()
-
+Image.MAX_IMAGE_PIXELS = None 
 # 입력된 img 경로를 저장한 배열
 i_arr = sys.argv
 del i_arr[0]

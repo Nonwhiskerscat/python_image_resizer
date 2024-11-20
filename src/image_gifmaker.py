@@ -5,6 +5,7 @@ from common import *
 import configparser
 
 imageRes = ProgramRes()
+Image.MAX_IMAGE_PIXELS = None 
 
 # sys.argv[1~-2] => 이미지 크기
 # sys.argv[-1] => 각 이미지 프레임

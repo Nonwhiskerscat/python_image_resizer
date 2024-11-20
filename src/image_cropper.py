@@ -6,6 +6,7 @@ import sys
 from PIL import Image
 
 imageRes = ProgramRes()
+Image.MAX_IMAGE_PIXELS = None 
 
 i_path = sys.argv[1].replace("\\", "/").strip('"')  # img path
 x_start = sys.argv[-5]  # X 시작 좌표

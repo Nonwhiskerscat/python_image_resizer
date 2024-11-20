@@ -6,6 +6,7 @@ import sys
 from common import *
 
 imageRes = ProgramRes()
+Image.MAX_IMAGE_PIXELS = None 
 
 # sys.argv[0] = file_name
 # sys.argv[1~-1] = image_files
