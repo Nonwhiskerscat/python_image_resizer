@@ -34,7 +34,7 @@ def grayScale(img):
 
 
 # 동적 이미지 그레이스케일 매서드
-def rotateGif(input, output):
+def grayScaleGif(input, output):
     with Image.open(input) as im:
         frames = []
 
@@ -78,7 +78,7 @@ def grayCommon(img):
                 grayed_image.save(fp=i_output)
         # 이미지 형식이 Gif일 때
         else:
-            rotateGif(img, i_output)
+            grayScaleGif(img, i_output)
 
         with Image.open(i_output) as im:
             imageRes.sizeX = im.width
