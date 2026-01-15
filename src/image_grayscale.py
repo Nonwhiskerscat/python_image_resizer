@@ -32,7 +32,7 @@ def grayScale(img):
     img_gray = img.convert("L")
     return img_gray
 
-
+ 
 # 동적 이미지 그레이스케일 매서드
 def grayScaleGif(input, output):
     with Image.open(input) as im:
